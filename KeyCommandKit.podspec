@@ -10,7 +10,7 @@ Pod::Spec.new do |spec|
   spec.ios.deployment_target = '8.0'
   spec.ios.frameworks = 'Foundation', 'UIKit'
 
-  spec.source_files = 'KeyCommandKit/*.{h,m,swift,storyboard,xib}'
+  spec.source_files = 'KeyCommandKit/*.{h,m,swift,xib}'
   
   spec.module_name = 'KeyCommandKit'
 end

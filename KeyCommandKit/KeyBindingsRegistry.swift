@@ -10,11 +10,16 @@ import Foundation
 
 let kKeyCommandKitError = "com.brunophilipe.KeyCommandKit.Error"
 
+public let UIKeyInputBackspace: String = "\u{8}"
+public let UIKeyInputTab: String = "\u{9}"
+public let UIKeyInputReturn: String = "\u{A}"
+
 public class KeyBindingsRegistry
 {
 	typealias KeyBindingsProviderHash = Int
 
 	private var keyBindings: [KeyBindingsProviderHash : [String : KeyBinding]] = [:]
+	private var providers: [KeyBindingsProviderHash: KeyBindingsProvider.Type] = [:]
 
 	public static let `default`: KeyBindingsRegistry = KeyBindingsRegistry()
 
@@ -58,6 +63,7 @@ public class KeyBindingsRegistry
 		if keyBindings[keyBinding.key] == nil
 		{
 			keyBindings[keyBinding.key] = keyBinding
+			providers[provider.providerHash] = provider
 		}
 		else if !(keyBindings[keyBinding.key]!.isEquivalent(toKeyBinding: keyBinding))
 		{
@@ -96,95 +102,48 @@ public class KeyBindingsRegistry
 	}
 }
 
-public extension Array where Element == KeyBinding
+internal extension KeyBindingsRegistry
 {
-	public func make(withActionsForKeys actions: [String : Selector]) -> [UIKeyCommand]
+	var providersCount: Int
 	{
-		var keyCommands = [UIKeyCommand]()
+		return keyBindings.count
+	}
 
-		for binding in self
+	func bindingsCountForProvider(withIndex index: Int) -> Int
+	{
+		let keys = keyBindings.keys
+		let index = keys.index(keys.startIndex, offsetBy: index)
+		let providerKey = keys[index]
+
+		return keyBindings[providerKey]?.count ?? 0
+	}
+
+	func binding(withIndex bindingIndex: Int, forProviderWithIndex providerIndex: Int) -> KeyBinding?
+	{
+		let keys = keyBindings.keys
+		let index = keys.index(keys.startIndex, offsetBy: providerIndex)
+		let providerKey = keys[index]
+
+		if let bindings = keyBindings[providerKey]
 		{
-			if let action = actions[binding.key]
-			{
-				keyCommands.append(binding.make(withAction: action))
-			}
-		}
+			let bindingsKeys = bindings.keys
+			let index = bindingsKeys.index(bindingsKeys.startIndex, offsetBy: bindingIndex)
+			let bindingKey = bindingsKeys[index]
 
-		return keyCommands
-	}
-}
-
-public protocol KeyBindingsProvider: NSObjectProtocol
-{
-	static func provideKeyBindings() -> [KeyBinding]
-}
-
-internal extension KeyBindingsProvider
-{
-	internal static var description: String
-	{
-		return NSStringFromClass(Self.self)
-	}
-
-	internal static var providerHash: Int
-	{
-		return NSStringFromClass(Self.self).hash
-	}
-}
-
-public class GlobalKeyBindingsProvider: NSObject, KeyBindingsProvider
-{
-	public static func provideKeyBindings() -> [KeyBinding] {
-		return []
-	}
-}
-
-public struct KeyBinding
-{
-	/// An internal identifier. Must be unique, and is used to query key bindings. It is never shown to the user.
-	public let key: String
-
-	/// A user-friendly description. It is shown in the system discoverability UI if the `isDiscoverable` property is true.
-	public let name: String
-
-	/// Whether this binding should be shown in the system discoverability UI.
-	public let isDiscoverable: Bool
-
-	/// The default input for this binding. Can be customized by the user, but the default will always be stored.
-	public let input: String
-
-	/// The default modifiers for this binding. Can be customized by the user, but the default will always be stored.
-	public let modifiers: UIKeyModifierFlags
-
-	/// Flag that indicates wether this binding was customized by the user.
-	public var isCustomized: Bool
-	{
-		return false
-	}
-
-	public func make(withAction action: Selector) -> UIKeyCommand
-	{
-		if isDiscoverable, #available(iOS 9.0, *)
-		{
-			return UIKeyCommand(input: input, modifierFlags: modifiers, action: action, discoverabilityTitle: name)
+			return bindings[bindingKey]
 		}
 		else
 		{
-			return UIKeyCommand(input: input, modifierFlags: modifiers, action: action)
+			return nil
 		}
 	}
 
-	public init(key: String, name: String, input: String, modifiers: UIKeyModifierFlags, isDiscoverable: Bool)
+	func nameForProvider(withIndex index: Int) -> String?
 	{
-		self.key = key
-		self.name = name
-		self.input = input
-		self.modifiers = modifiers
-		self.isDiscoverable = isDiscoverable
-	}
+		let keys = providers.keys
+		let index = keys.index(keys.startIndex, offsetBy: index)
+		let providerKey = keys[index]
 
-	internal func isEquivalent(toKeyBinding keyBinding: KeyBinding) -> Bool
-	{
-		return keyBinding.input == self.input && keyBinding.modifiers == self.modifiers
+		return providers[providerKey]?.providerName
 	}
 }

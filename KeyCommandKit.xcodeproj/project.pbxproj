@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1584882D1F05BB3C00BD2CD9 /* KeyBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1584882C1F05BB3C00BD2CD9 /* KeyBinding.swift */; };
+		1584882F1F05BB5A00BD2CD9 /* KeyBindingsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1584882E1F05BB5A00BD2CD9 /* KeyBindingsProvider.swift */; };
+		15A018A51F05B33200CB4B75 /* KeyBindingCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 15A018A41F05B33200CB4B75 /* KeyBindingCell.xib */; };
 		15F2D1171F00034000CD118F /* KeyCommandKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 15F2D10D1F00034000CD118F /* KeyCommandKit.framework */; };
 		15F2D11C1F00034000CD118F /* KeyCommandKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15F2D11B1F00034000CD118F /* KeyCommandKitTests.swift */; };
 		15F2D11E1F00034000CD118F /* KeyCommandKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 15F2D1101F00034000CD118F /* KeyCommandKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -27,6 +30,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1584882C1F05BB3C00BD2CD9 /* KeyBinding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyBinding.swift; sourceTree = "<group>"; };
+		1584882E1F05BB5A00BD2CD9 /* KeyBindingsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyBindingsProvider.swift; sourceTree = "<group>"; };
+		15A018A41F05B33200CB4B75 /* KeyBindingCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = KeyBindingCell.xib; sourceTree = "<group>"; };
 		15F2D10D1F00034000CD118F /* KeyCommandKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KeyCommandKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		15F2D1101F00034000CD118F /* KeyCommandKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyCommandKit.h; sourceTree = "<group>"; };
 		15F2D1111F00034000CD118F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -79,8 +85,11 @@
 			children = (
 				15F2D1101F00034000CD118F /* KeyCommandKit.h */,
 				15F2D1111F00034000CD118F /* Info.plist */,
+				1584882C1F05BB3C00BD2CD9 /* KeyBinding.swift */,
 				15F2D12D1F00055C00CD118F /* KeyBindingsRegistry.swift */,
 				15F2D1271F00039D00CD118F /* KeyBindingsViewController.swift */,
+				15A018A41F05B33200CB4B75 /* KeyBindingCell.xib */,
+				1584882E1F05BB5A00BD2CD9 /* KeyBindingsProvider.swift */,
 			);
 			path = KeyCommandKit;
 			sourceTree = "<group>";
@@ -186,6 +195,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				15A018A51F05B33200CB4B75 /* KeyBindingCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -205,6 +215,8 @@
 			files = (
 				15F2D12E1F00055C00CD118F /* KeyBindingsRegistry.swift in Sources */,
 				15F2D1281F00039D00CD118F /* KeyBindingsViewController.swift in Sources */,
+				1584882F1F05BB5A00BD2CD9 /* KeyBindingsProvider.swift in Sources */,
+				1584882D1F05BB3C00BD2CD9 /* KeyBinding.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
