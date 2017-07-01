@@ -20,6 +20,15 @@ public class KeyBindingsRegistry
 
 	private var keyBindings: [KeyBindingsProviderHash : [String : KeyBinding]] = [:]
 	private var providers: [KeyBindingsProviderHash: KeyBindingsProvider.Type] = [:]
+	private var customizations: [KeyBindingsProviderHash: [String: (input: String, modifiers: UIKeyModifierFlags)]]? = nil
+
+	public var applicationSupportName: String? = nil
+	{
+		didSet
+		{
+			loadCustomizations()
+		}
+	}
 
 	public static let `default`: KeyBindingsRegistry = KeyBindingsRegistry()
 
@@ -79,7 +88,7 @@ public class KeyBindingsRegistry
 	{
 		if let binding = self.keyBindings[provider.providerHash]?[key]
 		{
-			return binding
+			return customization(forKeyBinding: binding, inProvider: provider)
 		}
 		else
 		{
@@ -93,12 +102,120 @@ public class KeyBindingsRegistry
 	{
 		if let bindings = keyBindings[provider.providerHash]
 		{
-			return bindings.map({$0.value})
+			return bindings.map({customization(forKeyBinding: $0.value, inProvider: provider)})
 		}
 		else
 		{
 			return []
 		}
+	}
+}
+
+internal extension KeyBindingsRegistry
+{
+	func registerCustomization(input: String, modifiers: UIKeyModifierFlags,
+	                           forKeyBinding binding: KeyBinding,
+	                           inProvider provider: KeyBindingsProvider.Type = GlobalKeyBindingsProvider.self)
+	{
+		var customizations = self.customizations ?? [:]
+
+		if customizations[provider.providerHash] == nil
+		{
+			customizations[provider.providerHash] = [:]
+		}
+
+		customizations[provider.providerHash]?[binding.key] = (input: input, modifiers: modifiers)
+
+		self.customizations = customizations
+
+		writeCustomizations()
+	}
+
+	func customization(forKeyBinding binding: KeyBinding, inProvider provider: KeyBindingsProvider.Type = GlobalKeyBindingsProvider.self) -> KeyBinding
+	{
+		if let providerCustomizations = self.customizations?[provider.providerHash],
+		   let customization = providerCustomizations[binding.key]
+		{
+			return binding.customized(input: customization.input, modifiers: customization.modifiers)
+		}
+		else
+		{
+			return binding
+		}
+	}
+
+	func loadCustomizations()
+	{
+		if let bindingsFileURL = self.bindingsFileURL, let providersDict = NSDictionary(contentsOf: bindingsFileURL) as? [String: [String : [String : AnyObject]]]
+		{
+			customizations = [:]
+
+			for (providerHash, bindingsArray) in providersDict
+			{
+				guard let providerHashInt = Int(providerHash) else
+				{
+					continue
+				}
+
+				var bindingTuples = [String : (input: String, modifiers: UIKeyModifierFlags)]()
+				for (bindingKey, bindingValues) in bindingsArray
+				{
+					if let input = bindingValues["input"] as? String, let modifiers = bindingValues["modifiers"] as? Int
+					{
+						bindingTuples[bindingKey] = (input: input, modifiers: UIKeyModifierFlags(rawValue: modifiers))
+					}
+				}
+
+				customizations?[providerHashInt] = bindingTuples
+			}
+		}
+	}
+
+	func writeCustomizations()
+	{
+		if let bindingsFileURL = self.bindingsFileURL, let customizations = self.customizations
+		{
+			var providersDict = [String: [String : [String : AnyObject]]]()
+			for (providerHash, bindingTuples) in customizations
+			{
+				var bindingsArray = [String : [String : AnyObject]]()
+				for bindingTuple in bindingTuples
+				{
+					bindingsArray[bindingTuple.key] = ["input": bindingTuple.value.input as AnyObject,
+					                                   "modifiers": bindingTuple.value.modifiers.rawValue as AnyObject]
+				}
+
+				providersDict["\(providerHash)"] = bindingsArray
+			}
+
+			(providersDict as NSDictionary).write(to: bindingsFileURL, atomically: true)
+		}
+	}
+
+	var bindingsFileURL: URL?
+	{
+		if let applicationName = self.applicationSupportName,
+		   let appSupportDir = try? FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask,
+		                                                    appropriateFor: nil, create: true)
+		{
+			let appDir = appSupportDir.appendingPathComponent(applicationName)
+
+			if !FileManager.default.fileExists(atPath: appDir.path)
+			{
+				do
+				{
+					try FileManager.default.createDirectory(at: appDir, withIntermediateDirectories: true, attributes: nil)
+				}
+				catch let error
+				{
+					NSLog("Could not create directory for key bindings: \(error)")
+				}
+			}
+
+			return appDir.appendingPathComponent("KeyBindings").appendingPathExtension("plist")
+		}
+
+		return nil
 	}
 }
 

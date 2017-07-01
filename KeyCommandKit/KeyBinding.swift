@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct KeyBinding
+public class KeyBinding
 {
 	/// An internal identifier. Must be unique, and is used to query key bindings. It is never shown to the user.
 	public let key: String
@@ -49,6 +49,15 @@ public struct KeyBinding
 		self.input = input
 		self.modifiers = modifiers
 		self.isDiscoverable = isDiscoverable
+	}
+}
+
+internal class CustomizedKeyBinding: KeyBinding
+{
+	/// Flag that indicates wether this binding was customized by the user.
+	override public var isCustomized: Bool
+	{
+		return true
 	}
 }
 
@@ -116,6 +125,10 @@ internal extension KeyBinding
 		return string
 	}
 
+	func customized(input: String, modifiers: UIKeyModifierFlags) -> KeyBinding
+	{
+		return CustomizedKeyBinding(key: key, name: name, input: input, modifiers: modifiers, isDiscoverable: isDiscoverable)
+	}
 }
 
 public extension Array where Element == KeyBinding
