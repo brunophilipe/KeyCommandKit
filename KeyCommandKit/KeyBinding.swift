@@ -59,6 +59,17 @@ internal class CustomizedKeyBinding: KeyBinding
 	{
 		return true
 	}
+
+	var originalInput: String
+	var originalModifiers: UIKeyModifierFlags
+
+	init(key: String, name: String, input: String, modifiers: UIKeyModifierFlags, isDiscoverable: Bool, originalInput: String, originalModifiers: UIKeyModifierFlags)
+	{
+		self.originalInput = originalInput
+		self.originalModifiers = originalModifiers
+
+		super.init(key: key, name: name, input: input, modifiers: modifiers, isDiscoverable: isDiscoverable)
+	}
 }
 
 internal extension KeyBinding
@@ -127,7 +138,7 @@ internal extension KeyBinding
 
 	func customized(input: String, modifiers: UIKeyModifierFlags) -> KeyBinding
 	{
-		return CustomizedKeyBinding(key: key, name: name, input: input, modifiers: modifiers, isDiscoverable: isDiscoverable)
+		return CustomizedKeyBinding(key: key, name: name, input: input, modifiers: modifiers, isDiscoverable: isDiscoverable, originalInput: self.input, originalModifiers: self.modifiers)
 	}
 }
 

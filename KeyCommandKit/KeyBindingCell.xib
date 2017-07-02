@@ -25,7 +25,7 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="⌃⇧⌥⌘M" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="55T-7y-iEf">
+                    <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="⌃⇧⌥⌘M" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" id="55T-7y-iEf">
                         <rect key="frame" x="260" y="12" width="80" height="20.5"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
