@@ -46,8 +46,11 @@ public class KeyBindingsViewController: UITableViewController
 	{
         let cell = tableView.dequeueReusableCell(withIdentifier: "KeyBindingCell", for: indexPath)
 
-		if let binding = KeyBindingsRegistry.default.binding(withIndex: indexPath.row, forProviderWithIndex: indexPath.section)
+		if let original = KeyBindingsRegistry.default.binding(withIndex: indexPath.row, forProviderWithIndex: indexPath.section)
 		{
+			// binding will be equivallent to original if there's no customization
+			let binding = KeyBindingsRegistry.default.customization(forKeyBinding: original, inProviderWithIndex: indexPath.section)
+
 			cell.textLabel?.text = binding.name
 			cell.detailTextLabel?.text = binding.stringRepresentation
 		}
@@ -71,8 +74,13 @@ public class KeyBindingsViewController: UITableViewController
 
 	override public func tableView(_ aTableView: UITableView, didSelectRowAt indexPath: IndexPath)
 	{
-		if let binding = KeyBindingsRegistry.default.binding(withIndex: indexPath.row, forProviderWithIndex: indexPath.section)
+		let providerIndex = indexPath.section
+
+		if let original = KeyBindingsRegistry.default.binding(withIndex: indexPath.row, forProviderWithIndex: providerIndex)
 		{
+			// binding will be equivallent to original if there's no customization
+			let binding = KeyBindingsRegistry.default.customization(forKeyBinding: original, inProviderWithIndex: indexPath.section)
+
 			let editorViewController = KeyBindingEditorViewController(binding: binding)
 			editorViewController.cellTextColor = cellTextColor
 			editorViewController.cellBackgroundColor = cellBackgroundColor
@@ -85,19 +93,39 @@ public class KeyBindingsViewController: UITableViewController
 				navController.modalPresentationStyle = .popover
 				navController.preferredContentSize = editorViewController.preferredContentSize
 				editorViewController.view.tintColor = view.tintColor
-				editorViewController.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel,
-				                                                                        target: editorViewController,
-				                                                                        action: #selector(KeyBindingEditorViewController.cancel))
+
+				let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel,
+				                                   target: editorViewController,
+				                                   action: #selector(KeyBindingEditorViewController.cancel))
+
+				editorViewController.navigationItem.leftBarButtonItem = cancelButton
 
 				editorViewController.completion =
 					{
+						newBinding in
+
 						self.tableView.deselectRow(at: indexPath, animated: true)
+
+						if let newBinding = newBinding
+						{
+							KeyBindingsRegistry.default.registerCustomization(input: newBinding.input,
+							                                                  modifiers: newBinding.modifiers,
+							                                                  forKeyBinding: binding,
+							                                                  inProviderWithIndex: providerIndex)
+						}
+						else
+						{
+							KeyBindingsRegistry.default.removeCustomization(forKeyBinding: binding,
+							                                                inProviderWithIndex: providerIndex)
+						}
+
+						self.tableView.reloadRows(at: [indexPath], with: .automatic)
 					}
 
 				present(navController, animated: true, completion: nil)
 
-				let cell = tableView(aTableView, cellForRowAt: indexPath)
-				if let view = cell.detailTextLabel, let popoverController = navController.popoverPresentationController
+				if let view = tableView.cellForRow(at: indexPath)?.detailTextLabel,
+				   let popoverController = navController.popoverPresentationController
 				{
 					popoverController.backgroundColor = tableView.backgroundColor?.withAlphaComponent(0.9)
 					popoverController.permittedArrowDirections = .right

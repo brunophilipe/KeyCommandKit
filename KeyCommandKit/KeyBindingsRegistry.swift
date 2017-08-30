@@ -84,7 +84,8 @@ public class KeyBindingsRegistry
 		self.keyBindings[provider.providerHash] = keyBindings
 	}
 
-	public func binding(withKey key: String, forProvider provider: KeyBindingsProvider.Type = GlobalKeyBindingsProvider.self) throws -> KeyBinding
+	public func binding(withKey key: String,
+	                    forProvider provider: KeyBindingsProvider.Type = GlobalKeyBindingsProvider.self) throws -> KeyBinding
 	{
 		if let binding = self.keyBindings[provider.providerHash]?[key]
 		{
@@ -113,40 +114,10 @@ public class KeyBindingsRegistry
 
 internal extension KeyBindingsRegistry
 {
-	func registerCustomization(input: String, modifiers: UIKeyModifierFlags,
-	                           forKeyBinding binding: KeyBinding,
-	                           inProvider provider: KeyBindingsProvider.Type = GlobalKeyBindingsProvider.self)
-	{
-		var customizations = self.customizations ?? [:]
-
-		if customizations[provider.providerHash] == nil
-		{
-			customizations[provider.providerHash] = [:]
-		}
-
-		customizations[provider.providerHash]?[binding.key] = (input: input, modifiers: modifiers)
-
-		self.customizations = customizations
-
-		writeCustomizations()
-	}
-
-	func customization(forKeyBinding binding: KeyBinding, inProvider provider: KeyBindingsProvider.Type = GlobalKeyBindingsProvider.self) -> KeyBinding
-	{
-		if let providerCustomizations = self.customizations?[provider.providerHash],
-		   let customization = providerCustomizations[binding.key]
-		{
-			return binding.customized(input: customization.input, modifiers: customization.modifiers)
-		}
-		else
-		{
-			return binding
-		}
-	}
-
 	func loadCustomizations()
 	{
-		if let bindingsFileURL = self.bindingsFileURL, let providersDict = NSDictionary(contentsOf: bindingsFileURL) as? [String: [String : [String : AnyObject]]]
+		if let bindingsFileURL = self.bindingsFileURL,
+			let providersDict = NSDictionary(contentsOf: bindingsFileURL) as? [String: [String : [String : AnyObject]]]
 		{
 			customizations = [:]
 
@@ -192,6 +163,20 @@ internal extension KeyBindingsRegistry
 		}
 	}
 
+	func customization(forKeyBinding binding: KeyBinding,
+	                   inProvider provider: KeyBindingsProvider.Type = GlobalKeyBindingsProvider.self) -> KeyBinding
+	{
+		if let providerCustomizations = self.customizations?[provider.providerHash],
+			let customization = providerCustomizations[binding.key]
+		{
+			return binding.customized(input: customization.input, modifiers: customization.modifiers)
+		}
+		else
+		{
+			return binding
+		}
+	}
+
 	var bindingsFileURL: URL?
 	{
 		if let applicationName = self.applicationSupportName,
@@ -226,22 +211,82 @@ internal extension KeyBindingsRegistry
 		return keyBindings.count
 	}
 
-	func bindingsCountForProvider(withIndex index: Int) -> Int
+	func keyForProvider(withIndex providerIndex: Int) -> KeyBindingsProviderHash?
 	{
 		let keys = keyBindings.keys
-		let index = keys.index(keys.startIndex, offsetBy: index)
-		let providerKey = keys[index]
+		let index = keys.index(keys.startIndex, offsetBy: providerIndex)
+		return keys[index]
+	}
 
-		return keyBindings[providerKey]?.count ?? 0
+	func registerCustomization(input: String, modifiers: UIKeyModifierFlags,
+	                           forKeyBinding binding: KeyBinding,
+	                           inProviderWithIndex providerIndex: Int)
+	{
+		var customizations = self.customizations ?? [:]
+
+		if let providerKey = keyForProvider(withIndex: providerIndex)
+		{
+			if customizations[providerKey] == nil
+			{
+				customizations[providerKey] = [:]
+			}
+
+			customizations[providerKey]?[binding.key] = (input: input, modifiers: modifiers)
+
+			self.customizations = customizations
+
+			writeCustomizations()
+		}
+	}
+
+	func removeCustomization(forKeyBinding binding: KeyBinding, inProviderWithIndex providerIndex: Int)
+	{
+		var customizations = self.customizations ?? [:]
+
+		if let providerKey = keyForProvider(withIndex: providerIndex)
+		{
+			if customizations[providerKey] == nil
+			{
+				// No customization registered!
+				return
+			}
+
+			customizations[providerKey]?.removeValue(forKey: binding.key)
+
+			self.customizations = customizations
+
+			writeCustomizations()
+		}
+	}
+
+	func customization(forKeyBinding binding: KeyBinding, inProviderWithIndex providerIndex: Int) -> KeyBinding
+	{
+		if let providerKey = keyForProvider(withIndex: providerIndex),
+			let customization = self.customizations?[providerKey]?[binding.key]
+		{
+			return binding.customized(input: customization.input, modifiers: customization.modifiers)
+		}
+		else
+		{
+			return binding
+		}
+	}
+
+	func bindingsCountForProvider(withIndex providerIndex: Int) -> Int
+	{
+		if let providerKey = keyForProvider(withIndex: providerIndex)
+		{
+			return keyBindings[providerKey]?.count ?? 0
+		}
+		else
+		{
+			return 0
+		}
 	}
 
 	func binding(withIndex bindingIndex: Int, forProviderWithIndex providerIndex: Int) -> KeyBinding?
 	{
-		let keys = keyBindings.keys
-		let index = keys.index(keys.startIndex, offsetBy: providerIndex)
-		let providerKey = keys[index]
-
-		if let bindings = keyBindings[providerKey]
+		if let providerKey = keyForProvider(withIndex: providerIndex), let bindings = keyBindings[providerKey]
 		{
 			let bindingsKeys = bindings.keys
 			let index = bindingsKeys.index(bindingsKeys.startIndex, offsetBy: bindingIndex)
@@ -255,12 +300,15 @@ internal extension KeyBindingsRegistry
 		}
 	}
 
-	func nameForProvider(withIndex index: Int) -> String?
+	func nameForProvider(withIndex providerIndex: Int) -> String?
 	{
-		let keys = providers.keys
-		let index = keys.index(keys.startIndex, offsetBy: index)
-		let providerKey = keys[index]
-
-		return providers[providerKey]?.providerName
+		if let providerKey = keyForProvider(withIndex: providerIndex)
+		{
+			return providers[providerKey]?.providerName
+		}
+		else
+		{
+			return nil
+		}
 	}
 }

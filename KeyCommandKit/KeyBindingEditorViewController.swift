@@ -15,23 +15,35 @@ class KeyBindingEditorViewController: UIViewController
 
 	var binding: KeyBinding
 
-	var completion: (() -> Void)? = nil
+	var updatedBinding: KeyBinding?
+
+	var completion: ((KeyBinding?) -> Void)? = nil
+
+	var editorView: KeyBindingEditorView?
+	{
+		return view as? KeyBindingEditorView
+	}
 
 	init(binding: KeyBinding)
 	{
 		self.binding = binding
-		super.init(nibName: nil, bundle: nil)
+		self.updatedBinding = binding
+		super.init(nibName: "KeyBindingEditorView", bundle: Bundle(for: KeyBindingEditorViewController.self))
 
-		self.preferredContentSize = CGSize(width: 375.0, height: 300.0)
+		self.preferredContentSize = CGSize(width: 275.0, height: 200.0)
 	}
 
-	required init?(coder aDecoder: NSCoder) {
+	required init?(coder aDecoder: NSCoder)
+	{
 		fatalError("init(coder:) has not been implemented")
 	}
 
 	override func viewDidLoad()
 	{
 		super.viewDidLoad()
+
+		editorView?.viewController = self
+		editorView?.keyBindingDisplayLabel.text = binding.stringRepresentation
 
 		navigationItem.title = binding.name
 
@@ -48,21 +60,23 @@ class KeyBindingEditorViewController: UIViewController
 	{
 		super.viewWillAppear(animated)
 
-		let inputView = UITextField(frame: view.bounds)
-		inputView.textColor = cellTextColor
-		inputView.textAlignment = .center
-		inputView.delegate = self
-		inputView.tintColor = UIColor.clear
-		view.addSubview(inputView)
+		editorView?.keyBindingDisplayLabel.textColor = cellTextColor
+		editorView?.backgroundColor = cellBackgroundColor
 
 		let keyBindingControl = KeyBindingInputControl(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
 		keyBindingControl.newBindingAction =
 			{
 				keyCommand in
 
-				inputView.text = KeyBinding(key: "", name: "", input: keyCommand.input!, modifiers: keyCommand.modifierFlags, isDiscoverable: false).stringRepresentation
-				inputView.font = UIFont.systemFont(ofSize: 36.0)
-		}
+				let binding = KeyBinding(key: "", name: "",
+				                         input: keyCommand.input!, modifiers: keyCommand.modifierFlags,
+				                         isDiscoverable: false)
+
+				self.editorView?.keyBindingDisplayLabel.text = binding.stringRepresentation
+				self.editorView?.keyBindingDisplayLabel.font = UIFont.systemFont(ofSize: 36.0)
+
+				self.updatedBinding = self.binding.customized(input: binding.input, modifiers: binding.modifiers)
+			}
 
 		view.addSubview(keyBindingControl)
 
@@ -75,17 +89,21 @@ class KeyBindingEditorViewController: UIViewController
 
 		DispatchQueue.main.async
 			{
-				self.completion?()
-		}
+				self.completion?(self.updatedBinding)
+			}
 	}
 
 	@objc func revert()
 	{
+		self.updatedBinding = nil
 
+		dismiss(animated: true, completion: nil)
 	}
 
 	@objc func cancel()
 	{
+		self.updatedBinding = self.binding
+
 		dismiss(animated: true, completion: nil)
 	}
 }
@@ -157,5 +175,17 @@ class KeyBindingInputControl: UIControl
 		{
 			newBindingAction?(keyCommand)
 		}
+	}
+}
+
+class KeyBindingEditorView: UIView
+{
+	var viewController: KeyBindingEditorViewController? = nil
+
+	@IBOutlet var keyBindingDisplayLabel: UILabel!
+
+	@IBAction func save(sender: Any?)
+	{
+		 viewController?.dismiss(animated: true, completion: nil)
 	}
 }
