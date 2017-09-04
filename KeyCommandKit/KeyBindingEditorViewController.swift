@@ -135,7 +135,10 @@ class KeyBindingInputControl: UIControl
 
 	private func makeKeyCommands()
 	{
-		let characters = "abcdefghijklmnopqrstuvwxyz!\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`´{|}~".characters
+		let special = UIKeyInputLeftArrow + UIKeyInputRightArrow + UIKeyInputUpArrow + UIKeyInputDownArrow + UIKeyInputEscape
+					+ UIKeyInputBackspace + UIKeyInputTab + UIKeyInputReturn
+
+		let characters = "\(special)abcdefghijklmnopqrstuvwxyz!\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`´{|}~".characters
 
 		var keyCommands = [UIKeyCommand]()
 

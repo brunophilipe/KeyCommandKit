@@ -12,7 +12,7 @@ let kKeyCommandKitError = "com.brunophilipe.KeyCommandKit.Error"
 
 public let UIKeyInputBackspace: String = "\u{8}"
 public let UIKeyInputTab: String = "\u{9}"
-public let UIKeyInputReturn: String = "\u{A}"
+public let UIKeyInputReturn: String = "\u{D}"
 
 public class KeyBindingsRegistry
 {
