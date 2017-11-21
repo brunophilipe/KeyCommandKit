@@ -99,16 +99,9 @@ public class KeyBindingsRegistry
 		}
 	}
 
-	public func bindings(forProvider provider: KeyBindingsProvider.Type = GlobalKeyBindingsProvider.self) -> [KeyBinding]
+	public func bindings(forProvider provider: KeyBindingsProvider.Type = GlobalKeyBindingsProvider.self) -> [String: KeyBinding]
 	{
-		if let bindings = keyBindings[provider.providerHash]
-		{
-			return bindings.map({customization(forKeyBinding: $0.value, inProvider: provider)})
-		}
-		else
-		{
-			return []
-		}
+		return keyBindings[provider.providerHash] ?? [:]
 	}
 }
 

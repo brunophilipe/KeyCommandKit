@@ -142,15 +142,15 @@ internal extension KeyBinding
 	}
 }
 
-public extension Array where Element == KeyBinding
+public extension Dictionary where Key == String, Value == KeyBinding
 {
-	public func make(withActionsForKeys actions: [String : Selector]) -> [UIKeyCommand]
+	public func make(withActionsForKeys tuples: [(key: String, action: Selector)]) -> [UIKeyCommand]
 	{
 		var keyCommands = [UIKeyCommand]()
 
-		for binding in self
+		for (key, action) in tuples
 		{
-			if let action = actions[binding.key]
+			if let binding = self[key]
 			{
 				keyCommands.append(binding.make(withAction: action))
 			}
