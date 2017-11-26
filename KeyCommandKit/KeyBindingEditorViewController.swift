@@ -43,9 +43,9 @@ class KeyBindingEditorViewController: UIViewController
 		super.viewDidLoad()
 
 		editorView?.viewController = self
-		editorView?.keyBindingDisplayLabel.text = binding.stringRepresentation
+		editorView?.keyBindingDisplayLabel.keyBinding = binding
 
-		navigationItem.title = binding.name
+		navigationItem.title = ""
 
 		if binding is CustomizedKeyBinding
 		{
@@ -60,7 +60,7 @@ class KeyBindingEditorViewController: UIViewController
 	{
 		super.viewWillAppear(animated)
 
-		editorView?.keyBindingDisplayLabel.textColor = cellTextColor
+		editorView?.keyBindingDisplayLabel.color = cellTextColor ?? .darkText
 		editorView?.backgroundColor = cellBackgroundColor
 
 		let keyBindingControl = KeyBindingInputControl(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
@@ -72,8 +72,8 @@ class KeyBindingEditorViewController: UIViewController
 				                         input: keyCommand.input!, modifiers: keyCommand.modifierFlags,
 				                         isDiscoverable: false)
 
-				self.editorView?.keyBindingDisplayLabel.text = binding.stringRepresentation
-				self.editorView?.keyBindingDisplayLabel.font = UIFont.systemFont(ofSize: 36.0)
+				self.editorView?.keyBindingDisplayLabel.keyBinding = binding
+//				self.editorView?.keyBindingDisplayLabel.font = UIFont.systemFont(ofSize: 36.0)
 
 				self.updatedBinding = self.binding.customized(input: binding.input, modifiers: binding.modifiers)
 			}
@@ -135,28 +135,30 @@ class KeyBindingInputControl: UIControl
 
 	private func makeKeyCommands()
 	{
-		let special = UIKeyInputLeftArrow + UIKeyInputRightArrow + UIKeyInputUpArrow + UIKeyInputDownArrow + UIKeyInputEscape
-					+ UIKeyInputBackspace + UIKeyInputTab + UIKeyInputReturn
-
+		let special = UIKeyInputBackspace + UIKeyInputTab + UIKeyInputReturn + UIKeyInputDelete
 		let characters = "\(special)abcdefghijklmnopqrstuvwxyz!\"#$%&'()*+,-./0123456789:;<=>º?@[\\]^_`´{|}~"
 
 		var keyCommands = [UIKeyCommand]()
 
-		for character in characters
+		var inputs = characters.map({ String($0) })
+
+		inputs.append(contentsOf: [UIKeyInputLeftArrow, UIKeyInputRightArrow, UIKeyInputUpArrow, UIKeyInputDownArrow, UIKeyInputEscape])
+
+		for input in inputs
 		{
-			keyCommands.append(UIKeyCommand(input: String(character), modifierFlags: [.command], action: #selector(KeyBindingInputControl.commandAction(_:))))
-			keyCommands.append(UIKeyCommand(input: String(character), modifierFlags: [.shift], action: #selector(KeyBindingInputControl.commandAction(_:))))
-			keyCommands.append(UIKeyCommand(input: String(character), modifierFlags: [.control], action: #selector(KeyBindingInputControl.commandAction(_:))))
-			keyCommands.append(UIKeyCommand(input: String(character), modifierFlags: [.alternate], action: #selector(KeyBindingInputControl.commandAction(_:))))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.command], action: #selector(KeyBindingInputControl.commandAction(_:))))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.shift], action: #selector(KeyBindingInputControl.commandAction(_:))))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.control], action: #selector(KeyBindingInputControl.commandAction(_:))))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.alternate], action: #selector(KeyBindingInputControl.commandAction(_:))))
 
-			keyCommands.append(UIKeyCommand(input: String(character), modifierFlags: [.command, .control], action: #selector(KeyBindingInputControl.commandAction(_:))))
-			keyCommands.append(UIKeyCommand(input: String(character), modifierFlags: [.command, .shift], action: #selector(KeyBindingInputControl.commandAction(_:))))
-			keyCommands.append(UIKeyCommand(input: String(character), modifierFlags: [.command, .alternate], action: #selector(KeyBindingInputControl.commandAction(_:))))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.command, .control], action: #selector(KeyBindingInputControl.commandAction(_:))))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.command, .shift], action: #selector(KeyBindingInputControl.commandAction(_:))))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.command, .alternate], action: #selector(KeyBindingInputControl.commandAction(_:))))
 
-			keyCommands.append(UIKeyCommand(input: String(character), modifierFlags: [.shift, .control], action: #selector(KeyBindingInputControl.commandAction(_:))))
-			keyCommands.append(UIKeyCommand(input: String(character), modifierFlags: [.shift, .alternate], action: #selector(KeyBindingInputControl.commandAction(_:))))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.shift, .control], action: #selector(KeyBindingInputControl.commandAction(_:))))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.shift, .alternate], action: #selector(KeyBindingInputControl.commandAction(_:))))
 
-			keyCommands.append(UIKeyCommand(input: String(character), modifierFlags: [.control, .alternate], action: #selector(KeyBindingInputControl.commandAction(_:))))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.control, .alternate], action: #selector(KeyBindingInputControl.commandAction(_:))))
 		}
 
 		self._keyCommands = keyCommands
@@ -185,7 +187,7 @@ class KeyBindingEditorView: UIView
 {
 	var viewController: KeyBindingEditorViewController? = nil
 
-	@IBOutlet var keyBindingDisplayLabel: UILabel!
+	@IBOutlet var keyBindingDisplayLabel: KeyBindingLabel!
 
 	@IBAction func save(sender: Any?)
 	{

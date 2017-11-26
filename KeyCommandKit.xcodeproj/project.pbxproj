@@ -11,6 +11,8 @@
 		1584882F1F05BB5A00BD2CD9 /* KeyBindingsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1584882E1F05BB5A00BD2CD9 /* KeyBindingsProvider.swift */; };
 		15A018A51F05B33200CB4B75 /* KeyBindingCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 15A018A41F05B33200CB4B75 /* KeyBindingCell.xib */; };
 		15C0A54F1F09A86B001D73F7 /* KeyBindingEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C0A54E1F09A86B001D73F7 /* KeyBindingEditorViewController.swift */; };
+		15D2AD891FCA566E007B5D3B /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 15D2AD861FCA566E007B5D3B /* Media.xcassets */; };
+		15D2AD8B1FCA56B4007B5D3B /* KeyCommandLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D2AD851FCA566E007B5D3B /* KeyCommandLabel.swift */; };
 		15F2D1171F00034000CD118F /* KeyCommandKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 15F2D10D1F00034000CD118F /* KeyCommandKit.framework */; };
 		15F2D11C1F00034000CD118F /* KeyCommandKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15F2D11B1F00034000CD118F /* KeyCommandKitTests.swift */; };
 		15F2D11E1F00034000CD118F /* KeyCommandKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 15F2D1101F00034000CD118F /* KeyCommandKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -35,6 +37,8 @@
 		1584882E1F05BB5A00BD2CD9 /* KeyBindingsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyBindingsProvider.swift; sourceTree = "<group>"; };
 		15A018A41F05B33200CB4B75 /* KeyBindingCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = KeyBindingCell.xib; sourceTree = "<group>"; };
 		15C0A54E1F09A86B001D73F7 /* KeyBindingEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyBindingEditorViewController.swift; sourceTree = "<group>"; };
+		15D2AD851FCA566E007B5D3B /* KeyCommandLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCommandLabel.swift; sourceTree = "<group>"; };
+		15D2AD861FCA566E007B5D3B /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 		15F2D10D1F00034000CD118F /* KeyCommandKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KeyCommandKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		15F2D1101F00034000CD118F /* KeyCommandKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyCommandKit.h; sourceTree = "<group>"; };
 		15F2D1111F00034000CD118F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -93,6 +97,8 @@
 				15A018A41F05B33200CB4B75 /* KeyBindingCell.xib */,
 				1584882E1F05BB5A00BD2CD9 /* KeyBindingsProvider.swift */,
 				15C0A54E1F09A86B001D73F7 /* KeyBindingEditorViewController.swift */,
+				15D2AD851FCA566E007B5D3B /* KeyCommandLabel.swift */,
+				15D2AD861FCA566E007B5D3B /* Media.xcassets */,
 			);
 			path = KeyCommandKit;
 			sourceTree = "<group>";
@@ -163,7 +169,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0900;
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 0910;
 				ORGANIZATIONNAME = "Bruno Philipe";
 				TargetAttributes = {
 					15F2D10C1F00034000CD118F = {
@@ -198,6 +204,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				15D2AD891FCA566E007B5D3B /* Media.xcassets in Resources */,
 				15A018A51F05B33200CB4B75 /* KeyBindingCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -220,6 +227,7 @@
 				15F2D12E1F00055C00CD118F /* KeyBindingsRegistry.swift in Sources */,
 				15F2D1281F00039D00CD118F /* KeyBindingsViewController.swift in Sources */,
 				1584882F1F05BB5A00BD2CD9 /* KeyBindingsProvider.swift in Sources */,
+				15D2AD8B1FCA56B4007B5D3B /* KeyCommandLabel.swift in Sources */,
 				1584882D1F05BB3C00BD2CD9 /* KeyBinding.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -265,6 +273,8 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
@@ -292,7 +302,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -323,6 +333,8 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
@@ -344,7 +356,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
