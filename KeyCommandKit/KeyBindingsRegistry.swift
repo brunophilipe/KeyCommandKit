@@ -101,7 +101,13 @@ public class KeyBindingsRegistry
 
 	public func bindings(forProvider provider: KeyBindingsProvider.Type = GlobalKeyBindingsProvider.self) -> [String: KeyBinding]
 	{
-		return keyBindings[provider.providerHash] ?? [:]
+		guard let keyBindings = keyBindings[provider.providerHash] else
+		{
+			return [:]
+		}
+
+		let customizedBindings = keyBindings.values.map({ customization(forKeyBinding: $0, inProvider: provider) })
+		return zip(Array(keyBindings.keys), customizedBindings).reduce([String: KeyBinding](), { var dict = $0; dict[$1.0] = $1.1; return dict })
 	}
 }
 
@@ -109,11 +115,11 @@ internal extension KeyBindingsRegistry
 {
 	func loadCustomizations()
 	{
+		customizations = [:]
+
 		if let bindingsFileURL = self.bindingsFileURL,
 			let providersDict = NSDictionary(contentsOf: bindingsFileURL) as? [String: [String : [String : AnyObject]]]
 		{
-			customizations = [:]
-
 			for (providerHash, bindingsArray) in providersDict
 			{
 				guard let providerHashInt = Int(providerHash) else
