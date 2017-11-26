@@ -8,13 +8,12 @@
 import UIKit
 
 @IBDesignable
-class KeyBindingLabel: UIView
+public class KeyBindingLabel: UIView
 {
-	@IBInspectable var color: UIColor = .darkText
+	@IBInspectable public var color: UIColor = .darkText
+	@IBInspectable public var targetHeight: CGFloat = 28
 
-	@IBInspectable var targetHeight: CGFloat = 28
-
-	var keyBinding: KeyBinding? = nil
+	public var keyBinding: KeyBinding? = nil
 	{
 		didSet
 		{
@@ -22,10 +21,10 @@ class KeyBindingLabel: UIView
 		}
 	}
 
-	@IBOutlet var modifiersStackView: UIStackView!
-	@IBOutlet var inputStackView: UIStackView!
+	@IBOutlet public var modifiersStackView: UIStackView!
+	@IBOutlet public var inputStackView: UIStackView!
 
-	func buildKeyCommandRepresentation()
+	public func buildKeyCommandRepresentation()
 	{
 		buildKeyModifiersRepresentation()
 		buildKeyInputRepresentation()
@@ -125,7 +124,7 @@ class KeyBindingLabel: UIView
 	lazy var paragraphStyle: NSParagraphStyle =
 	{
 		var paragraphStyle = NSMutableParagraphStyle()
-		paragraphStyle.lineSpacing = targetHeight * 0.285
+		paragraphStyle.lineSpacing = 0
 		paragraphStyle.paragraphSpacing = 0
 		paragraphStyle.headIndent = 0
 		paragraphStyle.tailIndent = 0
@@ -150,15 +149,19 @@ class KeyBindingLabel: UIView
 	{
 		let image = UIImage(named: name, in: Bundle(for: KeyBindingLabel.self), compatibleWith: nil)
 		let maskView = UIImageView(image: image)
-		maskView.contentMode = .center
+		maskView.contentMode = .scaleAspectFit
 
 		if let image = image
 		{
-			let colorView = UIView(frame: CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height))
-			colorView.backgroundColor = color
-			colorView.mask = maskView
-
+			let colorView = FillView(frame: CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height))
+			colorView.fillColor = color
 			colorView.widthAnchor.constraint(greaterThanOrEqualToConstant: image.size.width).isActive = true
+
+			let containerHeight = bounds.height
+			let targetHeight = self.targetHeight
+			maskView.frame = CGRect(x: 0, y: containerHeight / 2 - targetHeight / 2, width: targetHeight * 1.3, height: targetHeight)
+
+			colorView.mask = maskView
 
 			return colorView
 		}
@@ -166,5 +169,16 @@ class KeyBindingLabel: UIView
 		{
 			return maskView
 		}
+	}
+}
+
+class FillView: UIView
+{
+	var fillColor: UIColor = .white
+
+	override func draw(_ rect: CGRect)
+	{
+		fillColor.setFill()
+		UIRectFill(rect)
 	}
 }

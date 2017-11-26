@@ -1,40 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13189.4" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13165.3"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="KeyBindingsViewController" customModule="KeyCommandKit" customModuleProvider="target"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" textLabel="cGi-ep-Swp" detailTextLabel="55T-7y-iEf" style="IBUITableViewCellStyleValue1" id="jIn-Ii-whz">
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" id="jIn-Ii-whz" customClass="KeyBindingCell" customModule="KeyCommandKit" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
             <autoresizingMask key="autoresizingMask"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="jIn-Ii-whz" id="Nou-IM-olE">
-                <rect key="frame" x="0.0" y="0.0" width="342" height="43.5"/>
+                <rect key="frame" x="0.0" y="0.0" width="341" height="43.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="cGi-ep-Swp">
-                        <rect key="frame" x="16" y="12" width="33.5" height="20.5"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                    <label opaque="NO" multipleTouchEnabled="YES" tag="1" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n3t-uS-PE0">
+                        <rect key="frame" x="16" y="11" width="33.5" height="20.5"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="⌃⇧⌥⌘M" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" id="55T-7y-iEf">
-                        <rect key="frame" x="260" y="12" width="80" height="20.5"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                        <nil key="textColor"/>
-                        <nil key="highlightedColor"/>
-                    </label>
+                    <view opaque="NO" tag="2" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="m3o-fk-BIh" customClass="KeyBindingLabel" customModule="KeyCommandKit" customModuleProvider="target">
+                        <rect key="frame" x="258" y="0.0" width="75" height="44"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hUp-bf-K2e">
+                                <rect key="frame" x="52" y="0.0" width="23" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="23" id="tzk-X6-5tt"/>
+                                </constraints>
+                            </stackView>
+                            <stackView opaque="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="infinite" translatesAutoresizingMaskIntoConstraints="NO" id="uZJ-zq-XtN">
+                                <rect key="frame" x="0.0" y="0.0" width="50" height="44"/>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="hUp-bf-K2e" firstAttribute="leading" secondItem="uZJ-zq-XtN" secondAttribute="trailing" constant="2" id="6eS-8s-9RB"/>
+                            <constraint firstAttribute="bottom" secondItem="hUp-bf-K2e" secondAttribute="bottom" id="Bdv-pi-9tS"/>
+                            <constraint firstAttribute="trailing" secondItem="hUp-bf-K2e" secondAttribute="trailing" id="Elk-XX-tm1"/>
+                            <constraint firstAttribute="bottom" secondItem="uZJ-zq-XtN" secondAttribute="bottom" id="Nmh-ic-IO0"/>
+                            <constraint firstItem="uZJ-zq-XtN" firstAttribute="leading" secondItem="m3o-fk-BIh" secondAttribute="leading" id="RP5-So-Z4E"/>
+                            <constraint firstItem="uZJ-zq-XtN" firstAttribute="top" secondItem="m3o-fk-BIh" secondAttribute="top" id="eSz-Ib-DtD"/>
+                            <constraint firstItem="hUp-bf-K2e" firstAttribute="top" secondItem="m3o-fk-BIh" secondAttribute="top" id="k2o-cP-8Bg"/>
+                        </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="targetHeight">
+                                <real key="value" value="17"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                <color key="value" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                        <connections>
+                            <outlet property="inputStackView" destination="hUp-bf-K2e" id="bnk-Om-ke4"/>
+                            <outlet property="modifiersStackView" destination="uZJ-zq-XtN" id="0xM-t8-7yi"/>
+                        </connections>
+                    </view>
                 </subviews>
+                <constraints>
+                    <constraint firstItem="m3o-fk-BIh" firstAttribute="top" secondItem="Nou-IM-olE" secondAttribute="top" id="05q-N7-n1d"/>
+                    <constraint firstAttribute="bottom" secondItem="m3o-fk-BIh" secondAttribute="bottom" id="3Ed-nl-RJp"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="m3o-fk-BIh" secondAttribute="trailing" id="MJY-Kj-67v"/>
+                    <constraint firstItem="n3t-uS-PE0" firstAttribute="centerY" secondItem="Nou-IM-olE" secondAttribute="centerY" id="jB4-8j-aPu"/>
+                    <constraint firstItem="n3t-uS-PE0" firstAttribute="leading" secondItem="Nou-IM-olE" secondAttribute="leadingMargin" id="nRh-B9-kB6"/>
+                </constraints>
             </tableViewCellContentView>
-            <point key="canvasLocation" x="51" y="110"/>
+            <connections>
+                <outlet property="keyBindingLabel" destination="m3o-fk-BIh" id="q1W-ou-Uia"/>
+                <outlet property="titleLabel" destination="n3t-uS-PE0" id="2sD-05-E0Q"/>
+            </connections>
+            <point key="canvasLocation" x="87" y="110"/>
         </tableViewCell>
     </objects>
 </document>

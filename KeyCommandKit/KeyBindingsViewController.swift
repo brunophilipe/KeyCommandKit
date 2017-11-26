@@ -46,13 +46,14 @@ public class KeyBindingsViewController: UITableViewController
 	{
         let cell = tableView.dequeueReusableCell(withIdentifier: "KeyBindingCell", for: indexPath)
 
-		if let original = KeyBindingsRegistry.default.binding(withIndex: indexPath.row, forProviderWithIndex: indexPath.section)
+		if let keyBindingCell = cell as? KeyBindingCell,
+			let original = KeyBindingsRegistry.default.binding(withIndex: indexPath.row, forProviderWithIndex: indexPath.section)
 		{
 			// binding will be equivallent to original if there's no customization
 			let binding = KeyBindingsRegistry.default.customization(forKeyBinding: original, inProviderWithIndex: indexPath.section)
 
-			cell.textLabel?.text = binding.name
-			cell.detailTextLabel?.text = binding.stringRepresentation
+			keyBindingCell.titleLabel.text = binding.name
+			keyBindingCell.keyBindingLabel.keyBinding = binding
 		}
 
 		if let color = self.cellBackgroundColor
@@ -60,10 +61,9 @@ public class KeyBindingsViewController: UITableViewController
 			cell.backgroundColor = color
 		}
 
-		if let color = self.cellTextColor
+		if let keyBindingCell = cell as? KeyBindingCell, let color = self.cellTextColor
 		{
-			cell.textLabel?.textColor = color
-			cell.detailTextLabel?.textColor = color
+			keyBindingCell.titleLabel.textColor = color
 		}
 
 		cell.selectedBackgroundView = UIView()
@@ -124,7 +124,7 @@ public class KeyBindingsViewController: UITableViewController
 
 				present(navController, animated: true, completion: nil)
 
-				if let view = tableView.cellForRow(at: indexPath)?.detailTextLabel,
+				if let view = (tableView.cellForRow(at: indexPath) as? KeyBindingCell)?.keyBindingLabel,
 				   let popoverController = navController.popoverPresentationController
 				{
 					popoverController.backgroundColor = tableView.backgroundColor?.withAlphaComponent(0.9)
@@ -144,4 +144,10 @@ public class KeyBindingsViewController: UITableViewController
 	{
 		return KeyBindingsRegistry.default.nameForProvider(withIndex: section)
 	}
+}
+
+class KeyBindingCell: UITableViewCell
+{
+	@IBOutlet var titleLabel: UILabel!
+	@IBOutlet var keyBindingLabel: KeyBindingLabel!
 }
