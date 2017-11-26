@@ -19,6 +19,7 @@ public class KeyBindingsRegistry
 {
 	typealias KeyBindingsProviderHash = Int
 
+	private var providersSortOrder: [KeyBindingsProviderHash] = []
 	private var keyBindings: [KeyBindingsProviderHash : [String : KeyBinding]] = [:]
 	private var providers: [KeyBindingsProviderHash: KeyBindingsProvider.Type] = [:]
 	private var customizations: [KeyBindingsProviderHash: [String: (input: String, modifiers: UIKeyModifierFlags)]]? = nil
@@ -57,6 +58,8 @@ public class KeyBindingsRegistry
 	/// Notice this calls the `provideKeyBindings()` method, which is *static*.
 	public func register(provider: KeyBindingsProvider.Type) throws
 	{
+		providersSortOrder.append(provider.providerHash)
+
 		for keyBinding in provider.provideKeyBindings()
 		{
 			try register(keyBinding: keyBinding, forProvider: provider)
@@ -213,9 +216,7 @@ internal extension KeyBindingsRegistry
 
 	func keyForProvider(withIndex providerIndex: Int) -> KeyBindingsProviderHash?
 	{
-		let keys = keyBindings.keys
-		let index = keys.index(keys.startIndex, offsetBy: providerIndex)
-		return keys[index]
+		return providersSortOrder[providerIndex]
 	}
 
 	func registerCustomization(input: String, modifiers: UIKeyModifierFlags,
