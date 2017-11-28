@@ -9,12 +9,12 @@
 import UIKit
 
 @IBDesignable
-public class KeyBindingsViewController: UITableViewController
+open class KeyBindingsViewController: UITableViewController
 {
 	@IBInspectable var cellBackgroundColor: UIColor? = nil
 	@IBInspectable var cellTextColor: UIColor? = nil
 
-    override public func viewDidLoad()
+	override open func viewDidLoad()
 	{
         super.viewDidLoad()
 
@@ -24,7 +24,7 @@ public class KeyBindingsViewController: UITableViewController
 		navigationItem.title = "Key Bindings"
     }
 
-    override public func didReceiveMemoryWarning()
+	override open func didReceiveMemoryWarning()
 	{
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -32,17 +32,17 @@ public class KeyBindingsViewController: UITableViewController
 
     // MARK: - Table view data source
 
-    override public func numberOfSections(in tableView: UITableView) -> Int
+	override open func numberOfSections(in tableView: UITableView) -> Int
 	{
         return KeyBindingsRegistry.default.providersCount
     }
 
-    override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
+	override open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
 	{
         return KeyBindingsRegistry.default.bindingsCountForProvider(withIndex: section)
     }
 
-    override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
+	override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
 	{
         let cell = tableView.dequeueReusableCell(withIdentifier: "KeyBindingCell", for: indexPath)
 
@@ -72,7 +72,7 @@ public class KeyBindingsViewController: UITableViewController
         return cell
     }
 
-	override public func tableView(_ aTableView: UITableView, didSelectRowAt indexPath: IndexPath)
+	override open func tableView(_ aTableView: UITableView, didSelectRowAt indexPath: IndexPath)
 	{
 		let providerIndex = indexPath.section
 
@@ -140,7 +140,7 @@ public class KeyBindingsViewController: UITableViewController
 		}
 	}
 
-	override public func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String?
+	override open func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String?
 	{
 		return KeyBindingsRegistry.default.nameForProvider(withIndex: section)
 	}
