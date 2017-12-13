@@ -88,7 +88,7 @@ open class KeyBindingsViewController: UITableViewController
 			if UIDevice.current.userInterfaceIdiom == .pad
 			{
 				let navController = UINavigationController(rootViewController: editorViewController)
-				navController.navigationBar.barStyle = .blackOpaque
+				navController.navigationBar.barStyle = .default
 				navController.navigationBar.tintColor = view.tintColor
 				navController.modalPresentationStyle = .popover
 				navController.preferredContentSize = editorViewController.preferredContentSize
