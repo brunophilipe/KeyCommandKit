@@ -8,10 +8,9 @@
 
 import UIKit
 
-class KeyBindingEditorViewController: UIViewController
+public class KeyBindingEditorViewController: UIViewController
 {
-	var cellBackgroundColor: UIColor? = nil
-	var cellTextColor: UIColor? = nil
+	@IBOutlet var _instructionsLabel: UILabel!
 
 	var binding: KeyBinding
 
@@ -33,12 +32,12 @@ class KeyBindingEditorViewController: UIViewController
 		self.preferredContentSize = CGSize(width: 275.0, height: 200.0)
 	}
 
-	required init?(coder aDecoder: NSCoder)
+	required public init?(coder aDecoder: NSCoder)
 	{
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	override func viewDidLoad()
+	override public func viewDidLoad()
 	{
 		super.viewDidLoad()
 
@@ -56,12 +55,9 @@ class KeyBindingEditorViewController: UIViewController
 		}
 	}
 
-	override func viewWillAppear(_ animated: Bool)
+	override public func viewWillAppear(_ animated: Bool)
 	{
 		super.viewWillAppear(animated)
-
-		editorView?.keyBindingDisplayLabel.color = cellTextColor ?? .darkText
-		editorView?.backgroundColor = cellBackgroundColor
 
 		let keyBindingControl = KeyBindingInputControl(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
 		keyBindingControl.newBindingAction =
@@ -83,7 +79,7 @@ class KeyBindingEditorViewController: UIViewController
 		keyBindingControl.becomeFirstResponder()
 	}
 
-	override func viewDidDisappear(_ animated: Bool)
+	override public func viewDidDisappear(_ animated: Bool)
 	{
 		super.viewDidDisappear(animated)
 
@@ -91,6 +87,16 @@ class KeyBindingEditorViewController: UIViewController
 			{
 				self.completion?(self.updatedBinding)
 			}
+	}
+
+	public func setInstructions(_ text: String)
+	{
+		_instructionsLabel.text = text
+	}
+
+	public var instructionsLabel: UILabel
+	{
+		return _instructionsLabel
 	}
 
 	@objc func revert()
@@ -110,7 +116,7 @@ class KeyBindingEditorViewController: UIViewController
 
 extension KeyBindingEditorViewController: UITextFieldDelegate
 {
-	func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool
+	public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool
 	{
 		return false
 	}

@@ -10,19 +10,48 @@ import UIKit
 @IBDesignable
 public class KeyBindingLabel: UIView
 {
+	private var needsUpdate: Bool = false
+
 	@IBInspectable public var color: UIColor = .darkText
+	{
+		didSet
+		{
+			needsUpdate = true
+			setNeedsDisplay()
+		}
+	}
+
 	@IBInspectable public var targetHeight: CGFloat = 28
+	{
+		didSet
+		{
+			needsUpdate = true
+			setNeedsDisplay()
+		}
+	}
 
 	public var keyBinding: KeyBinding? = nil
 	{
 		didSet
 		{
-			buildKeyCommandRepresentation()
+			needsUpdate = true
+			setNeedsDisplay()
 		}
 	}
 
 	@IBOutlet public var modifiersStackView: UIStackView!
 	@IBOutlet public var inputStackView: UIStackView!
+
+	public override func draw(_ rect: CGRect)
+	{
+		if needsUpdate && keyBinding != nil
+		{
+			buildKeyCommandRepresentation()
+			needsUpdate = false
+		}
+
+		super.draw(rect)
+	}
 
 	public func buildKeyCommandRepresentation()
 	{

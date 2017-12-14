@@ -11,9 +11,6 @@ import UIKit
 @IBDesignable
 open class KeyBindingsViewController: UITableViewController
 {
-	@IBInspectable var cellBackgroundColor: UIColor? = nil
-	@IBInspectable var cellTextColor: UIColor? = nil
-
 	override open func viewDidLoad()
 	{
         super.viewDidLoad()
@@ -29,6 +26,10 @@ open class KeyBindingsViewController: UITableViewController
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+
+	/// Place for subclasses to customize the editor controller. Default implementation does nothing.
+	open func setupEditorController(_ editorController: KeyBindingEditorViewController)
+	{}
 
     // MARK: - Table view data source
 
@@ -56,16 +57,6 @@ open class KeyBindingsViewController: UITableViewController
 			keyBindingCell.keyBindingLabel.keyBinding = binding
 		}
 
-		if let color = self.cellBackgroundColor
-		{
-			cell.backgroundColor = color
-		}
-
-		if let keyBindingCell = cell as? KeyBindingCell, let color = self.cellTextColor
-		{
-			keyBindingCell.titleLabel.textColor = color
-		}
-
 		cell.selectedBackgroundView = UIView()
 		cell.selectedBackgroundView?.backgroundColor = view.tintColor
 
@@ -82,8 +73,6 @@ open class KeyBindingsViewController: UITableViewController
 			let binding = KeyBindingsRegistry.default.customization(forKeyBinding: original, inProviderWithIndex: indexPath.section)
 
 			let editorViewController = KeyBindingEditorViewController(binding: binding)
-			editorViewController.cellTextColor = cellTextColor
-			editorViewController.cellBackgroundColor = cellBackgroundColor
 
 			if UIDevice.current.userInterfaceIdiom == .pad
 			{
@@ -137,6 +126,8 @@ open class KeyBindingsViewController: UITableViewController
 			{
 				navigationController?.pushViewController(editorViewController, animated: true)
 			}
+
+			setupEditorController(editorViewController)
 		}
 	}
 
@@ -146,8 +137,8 @@ open class KeyBindingsViewController: UITableViewController
 	}
 }
 
-class KeyBindingCell: UITableViewCell
+public class KeyBindingCell: UITableViewCell
 {
-	@IBOutlet var titleLabel: UILabel!
-	@IBOutlet var keyBindingLabel: KeyBindingLabel!
+	@IBOutlet public var titleLabel: UILabel!
+	@IBOutlet public var keyBindingLabel: KeyBindingLabel!
 }

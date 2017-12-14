@@ -12,6 +12,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="KeyBindingEditorViewController" customModule="KeyCommandKit" customModuleProvider="target">
             <connections>
+                <outlet property="_instructionsLabel" destination="RlH-JE-Uvl" id="DHM-Gk-ZWE"/>
                 <outlet property="view" destination="iN0-l3-epB" id="iMO-eS-1Xk"/>
             </connections>
         </placeholder>
