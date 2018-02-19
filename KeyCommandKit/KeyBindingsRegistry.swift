@@ -34,6 +34,9 @@ public class KeyBindingsRegistry
 
 	public static let `default`: KeyBindingsRegistry = KeyBindingsRegistry()
 
+	/// List of forbidden key commands. Any key commands set here will not be available to the user as a customization.
+	public var forbiddenKeyCommands: [UIKeyCommand] = []
+
 	/// Registers an individual key binding.
 	///
 	/// - Parameter keyBinding: The key binding to register

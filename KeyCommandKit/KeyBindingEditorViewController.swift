@@ -135,7 +135,8 @@ class KeyBindingInputControl: UIControl
 		makeKeyCommands()
 	}
 
-	required init?(coder aDecoder: NSCoder) {
+	required init?(coder aDecoder: NSCoder)
+	{
 		fatalError("init(coder:) has not been implemented")
 	}
 
@@ -150,21 +151,23 @@ class KeyBindingInputControl: UIControl
 
 		inputs.append(contentsOf: [UIKeyInputLeftArrow, UIKeyInputRightArrow, UIKeyInputUpArrow, UIKeyInputDownArrow, UIKeyInputEscape])
 
+		let action = #selector(KeyBindingInputControl.commandAction(_:))
+
 		for input in inputs
 		{
-			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.command], action: #selector(KeyBindingInputControl.commandAction(_:))))
-			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.shift], action: #selector(KeyBindingInputControl.commandAction(_:))))
-			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.control], action: #selector(KeyBindingInputControl.commandAction(_:))))
-			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.alternate], action: #selector(KeyBindingInputControl.commandAction(_:))))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.command], action: action))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.shift], action: action))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.control], action: action))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.alternate], action: action))
 
-			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.command, .control], action: #selector(KeyBindingInputControl.commandAction(_:))))
-			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.command, .shift], action: #selector(KeyBindingInputControl.commandAction(_:))))
-			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.command, .alternate], action: #selector(KeyBindingInputControl.commandAction(_:))))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.command, .control], action: action))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.command, .shift], action: action))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.command, .alternate], action: action))
 
-			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.shift, .control], action: #selector(KeyBindingInputControl.commandAction(_:))))
-			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.shift, .alternate], action: #selector(KeyBindingInputControl.commandAction(_:))))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.shift, .control], action: action))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.shift, .alternate], action: action))
 
-			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.control, .alternate], action: #selector(KeyBindingInputControl.commandAction(_:))))
+			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.control, .alternate], action: action))
 		}
 
 		self._keyCommands = keyCommands
@@ -184,6 +187,12 @@ class KeyBindingInputControl: UIControl
 	{
 		if let keyCommand = sender as? UIKeyCommand
 		{
+			if KeyBindingsRegistry.default.forbiddenKeyCommands.contains(keyCommand)
+			{
+				NSLog("NOPE")
+				return
+			}
+
 			newBindingAction?(keyCommand)
 		}
 	}
