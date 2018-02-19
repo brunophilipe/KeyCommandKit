@@ -37,8 +37,8 @@ public class KeyBindingsRegistry
 	/// Registers an individual key binding.
 	///
 	/// - Parameter keyBinding: The key binding to register
-	/// - Throws: kKeyCommandKitError:1001 If a key binding has already been registered with the same key, but is that's not equivalent to
-	/// the parameter key binding.
+	/// - Throws: kKeyCommandKitError:1001 If a key binding has already been registered with the same key, but is
+	/// that's not equivalent to the parameter key binding.
 	public func register(keyBinding: KeyBinding) throws
 	{
 		try register(keyBinding: keyBinding, forProvider: GlobalKeyBindingsProvider.self)
@@ -114,7 +114,12 @@ public class KeyBindingsRegistry
 		}
 
 		let customizedBindings = keyBindings.values.map({ customization(forKeyBinding: $0, inProvider: provider) })
-		return zip(Array(keyBindings.keys), customizedBindings).reduce([String: KeyBinding](), { var dict = $0; dict[$1.0] = $1.1; return dict })
+		return zip(Array(keyBindings.keys), customizedBindings).reduce([String: KeyBinding]())
+			{
+				var dict = $0
+				dict[$1.0] = $1.1
+				return dict
+			}
 	}
 }
 
