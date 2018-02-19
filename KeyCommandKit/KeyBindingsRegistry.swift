@@ -88,6 +88,8 @@ public class KeyBindingsRegistry
 		self.keyBindings[provider.providerHash] = keyBindings
 	}
 
+	/// Looks up and returns a binding registered in a certain provider with the specified key, or throws an exception
+	/// if the specified key is not found.
 	public func binding(withKey key: String,
 	                    forProvider provider: KeyBindingsProvider.Type = GlobalKeyBindingsProvider.self) throws -> KeyBinding
 	{
@@ -103,6 +105,7 @@ public class KeyBindingsRegistry
 		}
 	}
 
+	/// Returns all key bindings provided by a particular provider, indexed by the key of each key binding.
 	public func bindings(forProvider provider: KeyBindingsProvider.Type = GlobalKeyBindingsProvider.self) -> [String: KeyBinding]
 	{
 		guard let keyBindings = keyBindings[provider.providerHash] else
@@ -117,6 +120,7 @@ public class KeyBindingsRegistry
 
 internal extension KeyBindingsRegistry
 {
+	/// Load all customizations from the storage file.
 	func loadCustomizations()
 	{
 		customizations = [:]
@@ -145,6 +149,7 @@ internal extension KeyBindingsRegistry
 		}
 	}
 
+	/// Write all customizations to the storage file.
 	func writeCustomizations()
 	{
 		if let bindingsFileURL = self.bindingsFileURL, let customizations = self.customizations
@@ -166,6 +171,8 @@ internal extension KeyBindingsRegistry
 		}
 	}
 
+	/// Returns a key binding with any customizations set by the user for a particular provider, or the unchanged input
+	/// key binding if there are no customizations set.
 	func customization(forKeyBinding binding: KeyBinding,
 	                   inProvider provider: KeyBindingsProvider.Type = GlobalKeyBindingsProvider.self) -> KeyBinding
 	{
@@ -180,6 +187,7 @@ internal extension KeyBindingsRegistry
 		}
 	}
 
+	/// Returns the bindings customization file URL.
 	var bindingsFileURL: URL?
 	{
 		if let applicationName = self.applicationSupportName,
@@ -207,18 +215,22 @@ internal extension KeyBindingsRegistry
 	}
 }
 
+/// This extenstion provides methods to help render the key bindings table view.
 internal extension KeyBindingsRegistry
 {
+	/// Returns the count of registered providers.
 	var providersCount: Int
 	{
 		return keyBindings.count
 	}
 
+	/// Returns the unique identifier hash for a given provider.
 	func keyForProvider(withIndex providerIndex: Int) -> KeyBindingsProviderHash?
 	{
 		return providersSortOrder[providerIndex]
 	}
 
+	/// Register a user-customizarion for a key binding.
 	func registerCustomization(input: String, modifiers: UIKeyModifierFlags,
 	                           forKeyBinding binding: KeyBinding,
 	                           inProviderWithIndex providerIndex: Int)
@@ -240,6 +252,7 @@ internal extension KeyBindingsRegistry
 		}
 	}
 
+	/// Remove a customization for a key binding, effectively restoring it to the default binding.
 	func removeCustomization(forKeyBinding binding: KeyBinding, inProviderWithIndex providerIndex: Int)
 	{
 		var customizations = self.customizations ?? [:]
@@ -260,6 +273,9 @@ internal extension KeyBindingsRegistry
 		}
 	}
 
+	/// Looks up if there's a customization for a key binding, and returns it with that customization set, or returns
+	/// the same object if there's no customization registered. This is an internal method used to render the bindings
+	/// table view, and shouldn't be used for other purposes.
 	func customization(forKeyBinding binding: KeyBinding, inProviderWithIndex providerIndex: Int) -> KeyBinding
 	{
 		if let providerKey = keyForProvider(withIndex: providerIndex),
@@ -273,6 +289,8 @@ internal extension KeyBindingsRegistry
 		}
 	}
 
+	/// Returns the count of key bindings provided by a particular provider. This is an internal method used to render
+	/// the bindings table view, and shouldn't be used for other purposes.
 	func bindingsCountForProvider(withIndex providerIndex: Int) -> Int
 	{
 		if let providerKey = keyForProvider(withIndex: providerIndex)
@@ -285,6 +303,8 @@ internal extension KeyBindingsRegistry
 		}
 	}
 
+	/// Returns the n-th binding provided by a given provider. This is an internal method used to render the bindings
+	/// table view, and shouldn't be used for other purposes.
 	func binding(withIndex bindingIndex: Int, forProviderWithIndex providerIndex: Int) -> KeyBinding?
 	{
 		if let providerKey = keyForProvider(withIndex: providerIndex), let bindings = keyBindings[providerKey]
@@ -301,6 +321,7 @@ internal extension KeyBindingsRegistry
 		}
 	}
 
+	/// Returns the human-readable name of a provider.
 	func nameForProvider(withIndex providerIndex: Int) -> String?
 	{
 		if let providerKey = keyForProvider(withIndex: providerIndex)
