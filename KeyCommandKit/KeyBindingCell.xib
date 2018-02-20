@@ -26,12 +26,12 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <view opaque="NO" tag="2" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="m3o-fk-BIh" customClass="KeyBindingLabel" customModule="KeyCommandKit" customModuleProvider="target">
-                        <rect key="frame" x="258" y="0.0" width="75" height="44"/>
+                        <rect key="frame" x="243" y="0.0" width="90" height="44"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hUp-bf-K2e">
-                                <rect key="frame" x="52" y="0.0" width="23" height="44"/>
+                                <rect key="frame" x="52" y="0.0" width="38" height="44"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="23" id="tzk-X6-5tt"/>
+                                    <constraint firstAttribute="width" constant="38" id="tzk-X6-5tt"/>
                                 </constraints>
                             </stackView>
                             <stackView opaque="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="infinite" translatesAutoresizingMaskIntoConstraints="NO" id="uZJ-zq-XtN">
@@ -47,6 +47,7 @@
                             <constraint firstItem="uZJ-zq-XtN" firstAttribute="leading" secondItem="m3o-fk-BIh" secondAttribute="leading" id="RP5-So-Z4E"/>
                             <constraint firstItem="uZJ-zq-XtN" firstAttribute="top" secondItem="m3o-fk-BIh" secondAttribute="top" id="eSz-Ib-DtD"/>
                             <constraint firstItem="hUp-bf-K2e" firstAttribute="top" secondItem="m3o-fk-BIh" secondAttribute="top" id="k2o-cP-8Bg"/>
+                            <constraint firstAttribute="height" constant="43.5" id="zC1-Xl-jWt"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="number" keyPath="targetHeight">

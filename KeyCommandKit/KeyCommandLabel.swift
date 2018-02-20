@@ -198,6 +198,7 @@ public class KeyBindingLabel: UIView
 		{
 			let colorView = FillView(frame: CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height))
 			colorView.fillColor = color
+			colorView.translatesAutoresizingMaskIntoConstraints = false
 			colorView.widthAnchor.constraint(greaterThanOrEqualToConstant: image.size.width).isActive = true
 
 			let containerHeight = bounds.height
