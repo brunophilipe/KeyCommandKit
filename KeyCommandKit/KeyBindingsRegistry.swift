@@ -238,6 +238,12 @@ internal extension KeyBindingsRegistry
 		return providersSortOrder[providerIndex]
 	}
 
+	func customizeAsUnassigned(forKeyBinding binding: KeyBinding, inProviderWithIndex index: Int)
+	{
+		registerCustomization(input: UnassignedKeyBindingInput, modifiers: [],
+							  forKeyBinding: binding, inProviderWithIndex: index)
+	}
+
 	/// Register a user-customizarion for a key binding.
 	func registerCustomization(input: String, modifiers: UIKeyModifierFlags,
 	                           forKeyBinding binding: KeyBinding,

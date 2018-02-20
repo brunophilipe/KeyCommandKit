@@ -54,7 +54,16 @@ open class KeyBindingsViewController: UITableViewController
 			let binding = KeyBindingsRegistry.default.customization(forKeyBinding: original, inProviderWithIndex: indexPath.section)
 
 			keyBindingCell.titleLabel.text = binding.name
-			keyBindingCell.keyBindingLabel.keyBinding = binding
+
+			if binding.isUnassigned
+			{
+				keyBindingCell.keyBindingLabel.isHidden = true
+			}
+			else
+			{
+				keyBindingCell.keyBindingLabel.keyBinding = binding
+				keyBindingCell.keyBindingLabel.isHidden = false
+			}
 		}
 
 		cell.selectedBackgroundView = UIView()
@@ -91,21 +100,31 @@ open class KeyBindingsViewController: UITableViewController
 
 				editorViewController.completion =
 					{
-						newBinding in
+						editorResult in
 
 						self.tableView.deselectRow(at: indexPath, animated: true)
 
-						if let newBinding = newBinding
+						guard let editorResult = editorResult else
 						{
-							KeyBindingsRegistry.default.registerCustomization(input: newBinding.input,
-							                                                  modifiers: newBinding.modifiers,
-							                                                  forKeyBinding: binding,
-							                                                  inProviderWithIndex: providerIndex)
+							// Nil result means the user canceled the editor
+							return
 						}
-						else
+
+						switch editorResult
 						{
+						case .customize(let newBinding):
+							KeyBindingsRegistry.default.registerCustomization(input: newBinding.input,
+																			  modifiers: newBinding.modifiers,
+																			  forKeyBinding: binding,
+																			  inProviderWithIndex: providerIndex)
+
+						case .revert:
 							KeyBindingsRegistry.default.removeCustomization(forKeyBinding: binding,
-							                                                inProviderWithIndex: providerIndex)
+																			inProviderWithIndex: providerIndex)
+
+						case .unassign:
+							KeyBindingsRegistry.default.customizeAsUnassigned(forKeyBinding: binding,
+																			  inProviderWithIndex: providerIndex)
 						}
 
 						self.tableView.reloadRows(at: [indexPath], with: .automatic)

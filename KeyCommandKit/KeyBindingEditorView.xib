@@ -6,13 +6,13 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="KeyBindingEditorViewController" customModule="KeyCommandKit" customModuleProvider="target">
             <connections>
-                <outlet property="_instructionsLabel" destination="RlH-JE-Uvl" id="DHM-Gk-ZWE"/>
                 <outlet property="view" destination="iN0-l3-epB" id="iMO-eS-1Xk"/>
             </connections>
         </placeholder>
@@ -27,10 +27,10 @@
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zhT-CX-EI5">
-                    <rect key="frame" x="107" y="147" width="60" height="33"/>
+                <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zhT-CX-EI5">
+                    <rect key="frame" x="33.5" y="147" width="100" height="33"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="60" id="2qe-mw-2gm"/>
+                        <constraint firstAttribute="width" constant="100" id="2qe-mw-2gm"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
                     <state key="normal" title="Save"/>
@@ -72,18 +72,43 @@
                         <outlet property="modifiersStackView" destination="KL9-Xr-MOw" id="0hb-LS-JeH"/>
                     </connections>
                 </view>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&lt;none&gt;" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ggp-Ki-OxV">
+                    <rect key="frame" x="92" y="84.5" width="91" height="31.5"/>
+                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="26"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Gb8-qr-Wmv">
+                    <rect key="frame" x="141.5" y="147" width="100" height="33"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="100" id="3jO-TZ-Di5"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                    <state key="normal" title="Unassign"/>
+                    <connections>
+                        <action selector="unassign:" destination="iN0-l3-epB" eventType="touchUpInside" id="Lpc-ZB-XPs"/>
+                    </connections>
+                </button>
             </subviews>
             <constraints>
+                <constraint firstItem="Gb8-qr-Wmv" firstAttribute="leading" secondItem="zhT-CX-EI5" secondAttribute="trailing" constant="8" id="1v8-0B-pHV"/>
                 <constraint firstAttribute="bottom" secondItem="zhT-CX-EI5" secondAttribute="bottom" constant="20" id="F6v-6s-4tC"/>
                 <constraint firstItem="PoS-C4-kmO" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="IeF-Ek-cK8"/>
+                <constraint firstItem="Ggp-Ki-OxV" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="QTi-7I-Q9D"/>
                 <constraint firstItem="RlH-JE-Uvl" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" constant="20" id="Rgu-4p-LQU"/>
                 <constraint firstItem="RlH-JE-Uvl" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="VSB-KA-Cay"/>
                 <constraint firstItem="PoS-C4-kmO" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="WR4-a5-lhg"/>
-                <constraint firstItem="zhT-CX-EI5" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="wLr-0x-V9T"/>
+                <constraint firstItem="Ggp-Ki-OxV" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="bZC-fd-5Ng"/>
+                <constraint firstItem="Gb8-qr-Wmv" firstAttribute="baseline" secondItem="zhT-CX-EI5" secondAttribute="baseline" id="vji-WC-vex"/>
+                <constraint firstItem="zhT-CX-EI5" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="centerX" constant="-4" id="wLr-0x-V9T"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
+                <outlet property="instructionsLabel" destination="RlH-JE-Uvl" id="x8f-ZT-6fL"/>
                 <outlet property="keyBindingDisplayLabel" destination="PoS-C4-kmO" id="38H-Et-LvV"/>
+                <outlet property="saveButton" destination="zhT-CX-EI5" id="Vy5-p6-S3X"/>
+                <outlet property="unassignButton" destination="Gb8-qr-Wmv" id="177-c8-Hma"/>
+                <outlet property="unassignedLabel" destination="Ggp-Ki-OxV" id="QdS-Td-7gB"/>
             </connections>
             <point key="canvasLocation" x="34.5" y="54"/>
         </view>

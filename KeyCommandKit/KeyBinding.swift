@@ -7,6 +7,8 @@
 
 import Foundation
 
+let UnassignedKeyBindingInput = "Unassigned"
+
 public class KeyBinding
 {
 	/// An internal identifier. Must be unique, and is used to query key bindings. It is never shown to the user.
@@ -30,8 +32,21 @@ public class KeyBinding
 		return false
 	}
 
-	public func make(withAction action: Selector) -> UIKeyCommand
+	/// Whether this is a customization where the user unassigned the key binding, effectively deactivating it.
+	var isUnassigned: Bool
 	{
+		return input == UnassignedKeyBindingInput
+	}
+
+	/// Makes a UIKeyCommand instance by attaching an action to the receiver binding. If the receiver binding was
+	/// customized to "Unassigned" by the user, this method returns `nil`.
+	public func make(withAction action: Selector) -> UIKeyCommand?
+	{
+		if isUnassigned
+		{
+			return nil
+		}
+
 		if isDiscoverable, #available(iOS 9.0, *)
 		{
 			return UIKeyCommand(input: input, modifierFlags: modifiers, action: action, discoverabilityTitle: name)
@@ -138,21 +153,25 @@ internal extension KeyBinding
 
 	func customized(input: String, modifiers: UIKeyModifierFlags) -> KeyBinding
 	{
-		return CustomizedKeyBinding(key: key, name: name, input: input, modifiers: modifiers, isDiscoverable: isDiscoverable, originalInput: self.input, originalModifiers: self.modifiers)
+		return CustomizedKeyBinding(key: key, name: name, input: input, modifiers: modifiers,
+									isDiscoverable: isDiscoverable, originalInput: self.input,
+									originalModifiers: self.modifiers)
 	}
 }
 
 public extension Dictionary where Key == String, Value == KeyBinding
 {
+	/// Makes UIKeyCommand objects by attaching key bindings to actions by matching their respective `key`s.
+	/// If a key binding was customized to "Unassigned" by the user, then this routine skips it.
 	public func make(withActionsForKeys tuples: [(key: String, action: Selector)]) -> [UIKeyCommand]
 	{
 		var keyCommands = [UIKeyCommand]()
 
 		for (key, action) in tuples
 		{
-			if let binding = self[key]
+			if let binding = self[key], let keyCommand = binding.make(withAction: action)
 			{
-				keyCommands.append(binding.make(withAction: action))
+				keyCommands.append(keyCommand)
 			}
 		}
 

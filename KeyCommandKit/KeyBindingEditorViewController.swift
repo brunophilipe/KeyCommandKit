@@ -10,13 +10,11 @@ import UIKit
 
 public class KeyBindingEditorViewController: UIViewController
 {
-	@IBOutlet var _instructionsLabel: UILabel!
-
 	var binding: KeyBinding
 
-	var updatedBinding: KeyBinding?
+	var result: EditorResult? = nil
 
-	var completion: ((KeyBinding?) -> Void)? = nil
+	var completion: ((EditorResult?) -> Void)? = nil
 
 	var editorView: KeyBindingEditorView?
 	{
@@ -26,7 +24,6 @@ public class KeyBindingEditorViewController: UIViewController
 	init(binding: KeyBinding)
 	{
 		self.binding = binding
-		self.updatedBinding = binding
 		super.init(nibName: "KeyBindingEditorView", bundle: Bundle(for: KeyBindingEditorViewController.self))
 
 		self.preferredContentSize = CGSize(width: 275.0, height: 200.0)
@@ -42,7 +39,7 @@ public class KeyBindingEditorViewController: UIViewController
 		super.viewDidLoad()
 
 		editorView?.viewController = self
-		editorView?.keyBindingDisplayLabel.keyBinding = binding
+		updateLabels()
 
 		navigationItem.title = ""
 
@@ -68,10 +65,9 @@ public class KeyBindingEditorViewController: UIViewController
 				                         input: keyCommand.input!, modifiers: keyCommand.modifierFlags,
 				                         isDiscoverable: false)
 
-				self.editorView?.keyBindingDisplayLabel.keyBinding = binding
-//				self.editorView?.keyBindingDisplayLabel.font = UIFont.systemFont(ofSize: 36.0)
+				self.result = .customize(self.binding.customized(input: binding.input, modifiers: binding.modifiers))
 
-				self.updatedBinding = self.binding.customized(input: binding.input, modifiers: binding.modifiers)
+				self.updateLabels()
 			}
 
 		view.addSubview(keyBindingControl)
@@ -85,32 +81,90 @@ public class KeyBindingEditorViewController: UIViewController
 
 		DispatchQueue.main.async
 			{
-				self.completion?(self.updatedBinding)
+				self.completion?(self.result)
 			}
 	}
 
 	public func setInstructions(_ text: String)
 	{
-		_instructionsLabel.text = text
+		instructionsLabel.text = text
 	}
 
 	public var instructionsLabel: UILabel
 	{
-		return _instructionsLabel
+		return editorView!.instructionsLabel
+	}
+
+	public var unassignedLabel: UILabel
+	{
+		return editorView!.unassignedLabel
+	}
+
+	@objc func save()
+	{
+		dismiss(animated: true)
 	}
 
 	@objc func revert()
 	{
-		self.updatedBinding = nil
+		self.result = .revert
 
-		dismiss(animated: true, completion: nil)
+		dismiss(animated: true)
 	}
 
 	@objc func cancel()
 	{
-		self.updatedBinding = self.binding
+		self.result = nil
 
-		dismiss(animated: true, completion: nil)
+		dismiss(animated: true)
+	}
+
+	@objc func unassign()
+	{
+		self.result = .unassign
+
+		dismiss(animated: true)
+	}
+
+	enum EditorResult
+	{
+		case customize(KeyBinding)
+		case revert
+		case unassign
+	}
+
+	// Private
+
+	private func updateLabels()
+	{
+		guard let editorView = self.editorView else
+		{
+			// If there's no editor view, there are no labels to update!
+			return
+		}
+
+		let binding: KeyBinding
+
+		// If there is a customized binding set, we read from there
+		if case .some(.customize(let newBinding)) = result
+		{
+			binding = newBinding
+		}
+		else
+		{
+			binding = self.binding
+		}
+
+		let isUnassignedBinding = binding.isUnassigned
+		editorView.unassignedLabel.isHidden = !isUnassignedBinding
+		editorView.keyBindingDisplayLabel.isHidden = isUnassignedBinding
+		editorView.unassignButton.isEnabled = !isUnassignedBinding
+		editorView.saveButton.isEnabled = result != nil
+
+		if !isUnassignedBinding
+		{
+			editorView.keyBindingDisplayLabel.keyBinding = binding
+		}
 	}
 }
 
@@ -203,9 +257,18 @@ class KeyBindingEditorView: UIView
 	var viewController: KeyBindingEditorViewController? = nil
 
 	@IBOutlet var keyBindingDisplayLabel: KeyBindingLabel!
+	@IBOutlet var instructionsLabel: UILabel!
+	@IBOutlet var unassignedLabel: UILabel!
+	@IBOutlet var saveButton: UIButton!
+	@IBOutlet var unassignButton: UIButton!
 
 	@IBAction func save(sender: Any?)
 	{
-		 viewController?.dismiss(animated: true, completion: nil)
+		viewController?.save()
+	}
+
+	@IBAction func unassign(_ sender: Any?)
+	{
+		viewController?.unassign()
 	}
 }
