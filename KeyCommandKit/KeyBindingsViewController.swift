@@ -79,8 +79,15 @@ open class KeyBindingsViewController: UITableViewController
 			}
 		}
 
-		cell.selectedBackgroundView = UIView()
-		cell.selectedBackgroundView?.backgroundColor = view.tintColor
+		if cell.selectionStyle == .none
+		{
+			cell.backgroundView?.removeFromSuperview()
+		}
+		else
+		{
+			cell.selectedBackgroundView = UIView()
+			cell.selectedBackgroundView?.backgroundColor = tableView.tintColor
+		}
 
         return cell
     }
