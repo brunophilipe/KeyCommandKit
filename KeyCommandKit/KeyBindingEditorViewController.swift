@@ -117,36 +117,48 @@ public class KeyBindingEditorViewController: UIViewController
 
 	@objc func revert()
 	{
-		self.result = .revert
+		guard let originalBinding = (binding as? CustomizedKeyBinding)?.originalBinding else
+		{
+			dismiss(animated: true)
+			return
+		}
 
-		dismiss(animated: true)
+		if let conflictingBinding = KeyBindingsRegistry.default.firstBinding(equivalentTo: originalBinding)
+		{
+			showRevertConflictAlert(for: conflictingBinding)
+		}
+		else
+		{
+			result = .revert
+			dismiss(animated: true)
+		}
 	}
 
 	@objc func cancel()
 	{
-		self.result = nil
-
+		result = nil
 		dismiss(animated: true)
 	}
 
 	@objc func unassign()
 	{
-		self.result = .unassign
-
+		result = .unassign
 		dismiss(animated: true)
 	}
 
 	enum EditorResult
 	{
 		case customize(KeyBinding)
-		case unsassignAndCustomize(KeyBinding, KeyBinding)
+		case unsassignAndCustomize(KeyBindingsRegistry.BindingConflict, KeyBinding)
 		case revert
+		case revertAndUnassign(KeyBindingsRegistry.BindingConflict)
+		case revertBoth(KeyBindingsRegistry.BindingConflict)
 		case unassign
 	}
 
 	// Private
 
-	func storeNewBinding(with keyCommand: UIKeyCommand, unassigning: KeyBinding? = nil)
+	func storeNewBinding(with keyCommand: UIKeyCommand, unassigning: KeyBindingsRegistry.BindingConflict? = nil)
 	{
 		let binding = KeyBinding(key: "", name: "",
 								 input: keyCommand.input!, modifiers: keyCommand.modifierFlags,
@@ -166,6 +178,18 @@ public class KeyBindingEditorViewController: UIViewController
 		updateLabels()
 	}
 
+	func reverBindingUnassigning(_ unassigning: KeyBindingsRegistry.BindingConflict)
+	{
+		result = .revertAndUnassign(unassigning)
+		dismiss(animated: true)
+	}
+
+	func reverBindingAndRevertConflict(_ conflict: KeyBindingsRegistry.BindingConflict)
+	{
+		result = .revertBoth(conflict)
+		dismiss(animated: true)
+	}
+
 	private func showConflictAlert(for conflictingBinding: KeyBindingsRegistry.BindingConflict, with keyCommand: UIKeyCommand)
 	{
 		let conflictName = conflictingBinding.binding.name
@@ -175,7 +199,28 @@ public class KeyBindingEditorViewController: UIViewController
 			preferredStyle: .alert)
 
 		alert.addAction(UIAlertAction(title: "Unassign “\(conflictName)”", style: .destructive, handler: { (_) in
-			self.storeNewBinding(with: keyCommand, unassigning: conflictingBinding.binding)
+			self.storeNewBinding(with: keyCommand, unassigning: conflictingBinding)
+		}))
+
+		alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
+
+		present(alert, animated: true, completion: nil)
+	}
+
+	private func showRevertConflictAlert(for conflictingBinding: KeyBindingsRegistry.BindingConflict)
+	{
+		let conflictName = conflictingBinding.binding.name
+
+		let alert = UIAlertController(title: "Binding in Use",
+									  message: "The original key command is currently assigned: “\(conflictName)”",
+			preferredStyle: .alert)
+
+		alert.addAction(UIAlertAction(title: "Unassign “\(conflictName)” and revert", style: .destructive, handler: { (_) in
+			self.reverBindingUnassigning(conflictingBinding)
+		}))
+
+		alert.addAction(UIAlertAction(title: "Revert Both", style: .destructive, handler: { (_) in
+			self.reverBindingAndRevertConflict(conflictingBinding)
 		}))
 
 		alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))

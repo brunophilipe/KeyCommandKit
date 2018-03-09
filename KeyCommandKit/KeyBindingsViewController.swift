@@ -143,15 +143,15 @@ open class KeyBindingsViewController: UITableViewController
 														   inProviderWithIndex: providerIndex)
 
 						case .unsassignAndCustomize(let unassignedBinding, let customizedBinding):
-							registry.customizeAsUnassigned(forKeyBinding: unassignedBinding,
-														   inProviderWithIndex: providerIndex)
+							registry.customizeAsUnassigned(forKeyBinding: unassignedBinding.binding,
+														   inProviderWithIndex: unassignedBinding.providerIndex)
 
 							registry.registerCustomization(input: customizedBinding.input,
 														   modifiers: customizedBinding.modifiers,
 														   forKeyBinding: binding,
 														   inProviderWithIndex: providerIndex)
 
-							if let unassignedIndexPath = registry.indexPath(for: unassignedBinding)
+							if let unassignedIndexPath = registry.indexPath(for: unassignedBinding.binding)
 							{
 								indexPathsToReload.append(unassignedIndexPath)
 							}
@@ -159,6 +159,30 @@ open class KeyBindingsViewController: UITableViewController
 						case .revert:
 							registry.removeCustomization(forKeyBinding: binding,
 														 inProviderWithIndex: providerIndex)
+
+						case .revertAndUnassign(let unassignedBinding):
+							registry.customizeAsUnassigned(forKeyBinding: unassignedBinding.binding,
+														   inProviderWithIndex: unassignedBinding.providerIndex)
+
+							registry.removeCustomization(forKeyBinding: binding,
+														 inProviderWithIndex: providerIndex)
+
+							if let unassignedIndexPath = registry.indexPath(for: unassignedBinding.binding)
+							{
+								indexPathsToReload.append(unassignedIndexPath)
+							}
+
+						case .revertBoth(let conflictedBinding):
+							registry.removeCustomization(forKeyBinding: binding,
+														 inProviderWithIndex: providerIndex)
+
+							registry.removeCustomization(forKeyBinding: conflictedBinding.binding,
+														 inProviderWithIndex: conflictedBinding.providerIndex)
+
+							if let unassignedIndexPath = registry.indexPath(for: conflictedBinding.binding)
+							{
+								indexPathsToReload.append(unassignedIndexPath)
+							}
 
 						case .unassign:
 							registry.customizeAsUnassigned(forKeyBinding: binding,

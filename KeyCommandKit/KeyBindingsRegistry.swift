@@ -363,9 +363,9 @@ internal extension KeyBindingsRegistry
 
 	func indexPath(for lookupBinding: KeyBinding) -> IndexPath?
 	{
-		for (offset: section, element: (key: _, value: bindings)) in keyBindings.enumerated()
+		for (section, providerHash) in providersSortOrder.enumerated()
 		{
-			for (row, binding) in bindings.enumerated()
+			for (row, binding) in keyBindings[providerHash]!.enumerated()
 			{
 				if binding.key == lookupBinding.key
 				{
@@ -379,19 +379,34 @@ internal extension KeyBindingsRegistry
 	/// Returns the first installed binding (including customizations) that is equivalent to the provided binding, if any.
 	func firstBinding(equivalentTo lookupCommand: UIKeyCommand) -> BindingConflict?
 	{
+		return firstBinding(equivalentTo: (lookupCommand.input!, lookupCommand.modifierFlags))
+	}
+
+	/// Returns the first installed binding (including customizations) that is equivalent to the provided binding, if any.
+	func firstBinding(equivalentTo lookupBinding: KeyBinding) -> BindingConflict?
+	{
+		return firstBinding(equivalentTo: (lookupBinding.input, lookupBinding.modifiers), notMatchingKey: lookupBinding.key)
+	}
+
+	/// Returns the first installed binding (including customizations) that is equivalent to the provided binding, if any.
+	func firstBinding(equivalentTo lookup: (input: String, modifiers: UIKeyModifierFlags), notMatchingKey key: String? = nil) -> BindingConflict?
+	{
 		for (providerHash, bindings) in keyBindings
 		{
+			let provider = providers[providerHash]!
 			if let equivalentBinding = bindings.first(where:
 				{
 					_, installedBinding in
+					let customizedBinding = self.customization(forKeyBinding: installedBinding, inProvider: provider)
 
-					let customizedBinding = self.customization(forKeyBinding: installedBinding)
-
-					return customizedBinding.isEquivalent(toKeyCommand: lookupCommand)
+					return customizedBinding.input.lowercased() == lookup.input.lowercased()
+							&& customizedBinding.modifiers == lookup.modifiers
+							&& (key == nil || customizedBinding.key != key)
 				})
 			{
 				let providerIndex = providersSortOrder.index(of: providerHash)!
-				return BindingConflict(providerIndex: providerIndex,
+				return BindingConflict(providerHash: providerHash,
+									   providerIndex: providerIndex,
 									   key: equivalentBinding.key,
 									   binding: equivalentBinding.value)
 			}
@@ -402,6 +417,7 @@ internal extension KeyBindingsRegistry
 
 	struct BindingConflict
 	{
+		let providerHash: Int
 		let providerIndex: Int
 		let key: String
 		let binding: KeyBinding

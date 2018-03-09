@@ -99,6 +99,11 @@ internal class CustomizedKeyBinding: KeyBinding
 
 		super.init(key: key, name: name, input: input, modifiers: modifiers, isDiscoverable: isDiscoverable)
 	}
+
+	var originalBinding: KeyBinding
+	{
+		return KeyBinding(key: key, name: name, input: originalInput, modifiers: originalModifiers, isDiscoverable: isDiscoverable)
+	}
 }
 
 internal extension KeyBinding
