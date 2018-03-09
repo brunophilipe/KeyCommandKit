@@ -108,6 +108,11 @@ internal extension KeyBinding
 		return keyBinding.input == self.input && keyBinding.modifiers == self.modifiers
 	}
 
+	func isEquivalent(toKeyCommand keyCommand: UIKeyCommand) -> Bool
+	{
+		return keyCommand.input == self.input && keyCommand.modifierFlags == self.modifiers
+	}
+
 	var stringRepresentation: String
 	{
 		var string = ""

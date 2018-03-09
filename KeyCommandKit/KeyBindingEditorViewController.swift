@@ -71,17 +71,13 @@ public class KeyBindingEditorViewController: UIViewController
 		super.viewWillAppear(animated)
 
 		let keyBindingControl = KeyBindingInputControl(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
+		keyBindingControl.conflictAction =
+			{
+				(conflict, keyCommand) in self.showConflictAlert(for: conflict, with: keyCommand)
+			}
 		keyBindingControl.newBindingAction =
 			{
-				keyCommand in
-
-				let binding = KeyBinding(key: "", name: "",
-				                         input: keyCommand.input!, modifiers: keyCommand.modifierFlags,
-				                         isDiscoverable: false)
-
-				self.result = .customize(self.binding.customized(input: binding.input, modifiers: binding.modifiers))
-
-				self.updateLabels()
+				keyCommand in self.storeNewBinding(with: keyCommand)
 			}
 
 		view.addSubview(keyBindingControl)
@@ -143,11 +139,49 @@ public class KeyBindingEditorViewController: UIViewController
 	enum EditorResult
 	{
 		case customize(KeyBinding)
+		case unsassignAndCustomize(KeyBinding, KeyBinding)
 		case revert
 		case unassign
 	}
 
 	// Private
+
+	func storeNewBinding(with keyCommand: UIKeyCommand, unassigning: KeyBinding? = nil)
+	{
+		let binding = KeyBinding(key: "", name: "",
+								 input: keyCommand.input!, modifiers: keyCommand.modifierFlags,
+								 isDiscoverable: false)
+
+		let customizedBinding = binding.customized(input: binding.input, modifiers: binding.modifiers)
+
+		if let unassignedBinding = unassigning
+		{
+			result = .unsassignAndCustomize(unassignedBinding, customizedBinding)
+		}
+		else
+		{
+			result = .customize(customizedBinding)
+		}
+
+		updateLabels()
+	}
+
+	private func showConflictAlert(for conflictingBinding: KeyBindingsRegistry.BindingConflict, with keyCommand: UIKeyCommand)
+	{
+		let conflictName = conflictingBinding.binding.name
+
+		let alert = UIAlertController(title: "Binding in Use",
+									  message: "The inserted key command is already being used: “\(conflictName)”",
+			preferredStyle: .alert)
+
+		alert.addAction(UIAlertAction(title: "Unassign “\(conflictName)”", style: .destructive, handler: { (_) in
+			self.storeNewBinding(with: keyCommand, unassigning: conflictingBinding.binding)
+		}))
+
+		alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
+
+		present(alert, animated: true, completion: nil)
+	}
 
 	private func updateLabels()
 	{
@@ -160,12 +194,12 @@ public class KeyBindingEditorViewController: UIViewController
 		let binding: KeyBinding
 
 		// If there is a customized binding set, we read from there
-		if case .some(.customize(let newBinding)) = result
+		switch result
 		{
+		case .some(.customize(let newBinding)), .some(.unsassignAndCustomize(_, let newBinding)):
 			binding = newBinding
-		}
-		else
-		{
+
+		default:
 			binding = self.binding
 		}
 
@@ -193,6 +227,8 @@ extension KeyBindingEditorViewController: UITextFieldDelegate
 class KeyBindingInputControl: UIControl
 {
 	private var _keyCommands: [UIKeyCommand]!
+
+	var conflictAction: ((KeyBindingsRegistry.BindingConflict, UIKeyCommand) -> Void)? = nil
 
 	var newBindingAction: ((UIKeyCommand) -> Void)? = nil
 
@@ -255,13 +291,21 @@ class KeyBindingInputControl: UIControl
 	{
 		if let keyCommand = sender as? UIKeyCommand
 		{
-			if KeyBindingsRegistry.default.forbiddenKeyCommands.contains(keyCommand)
+			let registry = KeyBindingsRegistry.default
+
+			if registry.forbiddenKeyCommands.contains(keyCommand)
 			{
-				NSLog("NOPE")
 				return
 			}
 
-			newBindingAction?(keyCommand)
+			if let bindingConflict = registry.firstBinding(equivalentTo: keyCommand)
+			{
+				conflictAction?(bindingConflict, keyCommand)
+			}
+			else
+			{
+				newBindingAction?(keyCommand)
+			}
 		}
 	}
 }

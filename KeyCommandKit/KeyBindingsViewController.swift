@@ -124,30 +124,48 @@ open class KeyBindingsViewController: UITableViewController
 
 						self.tableView.deselectRow(at: indexPath, animated: true)
 
+						var indexPathsToReload: [IndexPath] = [indexPath]
+
 						guard let editorResult = editorResult else
 						{
 							// Nil result means the user canceled the editor
 							return
 						}
 
+						let registry = KeyBindingsRegistry.default
+
 						switch editorResult
 						{
 						case .customize(let newBinding):
-							KeyBindingsRegistry.default.registerCustomization(input: newBinding.input,
-																			  modifiers: newBinding.modifiers,
-																			  forKeyBinding: binding,
-																			  inProviderWithIndex: providerIndex)
+							registry.registerCustomization(input: newBinding.input,
+														   modifiers: newBinding.modifiers,
+														   forKeyBinding: binding,
+														   inProviderWithIndex: providerIndex)
+
+						case .unsassignAndCustomize(let unassignedBinding, let customizedBinding):
+							registry.customizeAsUnassigned(forKeyBinding: unassignedBinding,
+														   inProviderWithIndex: providerIndex)
+
+							registry.registerCustomization(input: customizedBinding.input,
+														   modifiers: customizedBinding.modifiers,
+														   forKeyBinding: binding,
+														   inProviderWithIndex: providerIndex)
+
+							if let unassignedIndexPath = registry.indexPath(for: unassignedBinding)
+							{
+								indexPathsToReload.append(unassignedIndexPath)
+							}
 
 						case .revert:
-							KeyBindingsRegistry.default.removeCustomization(forKeyBinding: binding,
-																			inProviderWithIndex: providerIndex)
+							registry.removeCustomization(forKeyBinding: binding,
+														 inProviderWithIndex: providerIndex)
 
 						case .unassign:
-							KeyBindingsRegistry.default.customizeAsUnassigned(forKeyBinding: binding,
-																			  inProviderWithIndex: providerIndex)
+							registry.customizeAsUnassigned(forKeyBinding: binding,
+														   inProviderWithIndex: providerIndex)
 						}
 
-						self.tableView.reloadRows(at: [indexPath], with: .automatic)
+						self.tableView.reloadRows(at: indexPathsToReload, with: .automatic)
 					}
 
 				present(navController, animated: true, completion: nil)

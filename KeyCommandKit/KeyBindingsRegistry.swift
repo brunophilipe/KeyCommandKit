@@ -360,4 +360,50 @@ internal extension KeyBindingsRegistry
 			return nil
 		}
 	}
+
+	func indexPath(for lookupBinding: KeyBinding) -> IndexPath?
+	{
+		for (offset: section, element: (key: _, value: bindings)) in keyBindings.enumerated()
+		{
+			for (row, binding) in bindings.enumerated()
+			{
+				if binding.key == lookupBinding.key
+				{
+					return IndexPath(row: row, section: section)
+				}
+			}
+		}
+		return nil
+	}
+
+	/// Returns the first installed binding (including customizations) that is equivalent to the provided binding, if any.
+	func firstBinding(equivalentTo lookupCommand: UIKeyCommand) -> BindingConflict?
+	{
+		for (providerHash, bindings) in keyBindings
+		{
+			if let equivalentBinding = bindings.first(where:
+				{
+					_, installedBinding in
+
+					let customizedBinding = self.customization(forKeyBinding: installedBinding)
+
+					return customizedBinding.isEquivalent(toKeyCommand: lookupCommand)
+				})
+			{
+				let providerIndex = providersSortOrder.index(of: providerHash)!
+				return BindingConflict(providerIndex: providerIndex,
+									   key: equivalentBinding.key,
+									   binding: equivalentBinding.value)
+			}
+		}
+
+		return nil
+	}
+
+	struct BindingConflict
+	{
+		let providerIndex: Int
+		let key: String
+		let binding: KeyBinding
+	}
 }
