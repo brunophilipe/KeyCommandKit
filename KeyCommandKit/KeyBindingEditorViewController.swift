@@ -112,14 +112,14 @@ public class KeyBindingEditorViewController: UIViewController
 
 	@objc func save()
 	{
-		dismiss(animated: true)
+		dismissInContext()
 	}
 
 	@objc func revert()
 	{
 		guard let originalBinding = (binding as? CustomizedKeyBinding)?.originalBinding else
 		{
-			dismiss(animated: true)
+			dismissInContext()
 			return
 		}
 
@@ -130,20 +130,20 @@ public class KeyBindingEditorViewController: UIViewController
 		else
 		{
 			result = .revert
-			dismiss(animated: true)
+			dismissInContext()
 		}
 	}
 
 	@objc func cancel()
 	{
 		result = nil
-		dismiss(animated: true)
+		dismissInContext()
 	}
 
 	@objc func unassign()
 	{
 		result = .unassign
-		dismiss(animated: true)
+		dismissInContext()
 	}
 
 	enum EditorResult
@@ -157,6 +157,18 @@ public class KeyBindingEditorViewController: UIViewController
 	}
 
 	// Private
+	
+	private func dismissInContext()
+	{
+		if self.popoverPresentationController != nil
+		{
+			dismiss(animated: true)
+		}
+		else
+		{
+			navigationController?.popViewController(animated: true)
+		}
+	}
 
 	func storeNewBinding(with keyCommand: UIKeyCommand, unassigning: KeyBindingsRegistry.BindingConflict? = nil)
 	{
@@ -181,13 +193,13 @@ public class KeyBindingEditorViewController: UIViewController
 	func reverBindingUnassigning(_ unassigning: KeyBindingsRegistry.BindingConflict)
 	{
 		result = .revertAndUnassign(unassigning)
-		dismiss(animated: true)
+		dismissInContext()
 	}
 
 	func reverBindingAndRevertConflict(_ conflict: KeyBindingsRegistry.BindingConflict)
 	{
 		result = .revertBoth(conflict)
-		dismiss(animated: true)
+		dismissInContext()
 	}
 
 	private func showConflictAlert(for conflictingBinding: KeyBindingsRegistry.BindingConflict, with keyCommand: UIKeyCommand)
@@ -355,15 +367,15 @@ class KeyBindingInputControl: UIControl
 	}
 }
 
-class KeyBindingEditorView: UIView
+public class KeyBindingEditorView: UIView
 {
 	var viewController: KeyBindingEditorViewController? = nil
 
-	@IBOutlet var keyBindingDisplayLabel: KeyBindingLabel!
-	@IBOutlet var instructionsLabel: UILabel!
-	@IBOutlet var unassignedLabel: UILabel!
-	@IBOutlet var saveButton: UIButton!
-	@IBOutlet var unassignButton: UIButton!
+	@IBOutlet public var keyBindingDisplayLabel: KeyBindingLabel!
+	@IBOutlet public var instructionsLabel: UILabel!
+	@IBOutlet public var unassignedLabel: UILabel!
+	@IBOutlet public var saveButton: UIButton!
+	@IBOutlet public var unassignButton: UIButton!
 
 	@IBAction func save(sender: Any?)
 	{

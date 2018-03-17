@@ -118,80 +118,6 @@ open class KeyBindingsViewController: UITableViewController
 
 				editorViewController.navigationItem.leftBarButtonItem = cancelButton
 
-				editorViewController.completion =
-					{
-						editorResult in
-
-						self.tableView.deselectRow(at: indexPath, animated: true)
-
-						var indexPathsToReload: [IndexPath] = [indexPath]
-
-						guard let editorResult = editorResult else
-						{
-							// Nil result means the user canceled the editor
-							return
-						}
-
-						let registry = KeyBindingsRegistry.default
-
-						switch editorResult
-						{
-						case .customize(let newBinding):
-							registry.registerCustomization(input: newBinding.input,
-														   modifiers: newBinding.modifiers,
-														   forKeyBinding: binding,
-														   inProviderWithIndex: providerIndex)
-
-						case .unsassignAndCustomize(let unassignedBinding, let customizedBinding):
-							registry.customizeAsUnassigned(forKeyBinding: unassignedBinding.binding,
-														   inProviderWithIndex: unassignedBinding.providerIndex)
-
-							registry.registerCustomization(input: customizedBinding.input,
-														   modifiers: customizedBinding.modifiers,
-														   forKeyBinding: binding,
-														   inProviderWithIndex: providerIndex)
-
-							if let unassignedIndexPath = registry.indexPath(for: unassignedBinding.binding)
-							{
-								indexPathsToReload.append(unassignedIndexPath)
-							}
-
-						case .revert:
-							registry.removeCustomization(forKeyBinding: binding,
-														 inProviderWithIndex: providerIndex)
-
-						case .revertAndUnassign(let unassignedBinding):
-							registry.customizeAsUnassigned(forKeyBinding: unassignedBinding.binding,
-														   inProviderWithIndex: unassignedBinding.providerIndex)
-
-							registry.removeCustomization(forKeyBinding: binding,
-														 inProviderWithIndex: providerIndex)
-
-							if let unassignedIndexPath = registry.indexPath(for: unassignedBinding.binding)
-							{
-								indexPathsToReload.append(unassignedIndexPath)
-							}
-
-						case .revertBoth(let conflictedBinding):
-							registry.removeCustomization(forKeyBinding: binding,
-														 inProviderWithIndex: providerIndex)
-
-							registry.removeCustomization(forKeyBinding: conflictedBinding.binding,
-														 inProviderWithIndex: conflictedBinding.providerIndex)
-
-							if let unassignedIndexPath = registry.indexPath(for: conflictedBinding.binding)
-							{
-								indexPathsToReload.append(unassignedIndexPath)
-							}
-
-						case .unassign:
-							registry.customizeAsUnassigned(forKeyBinding: binding,
-														   inProviderWithIndex: providerIndex)
-						}
-
-						self.tableView.reloadRows(at: indexPathsToReload, with: .automatic)
-					}
-
 				present(navController, animated: true, completion: nil)
 
 				if let view = (tableView.cellForRow(at: indexPath) as? KeyBindingCell)?.keyBindingLabel,
@@ -207,6 +133,80 @@ open class KeyBindingsViewController: UITableViewController
 			{
 				navigationController?.pushViewController(editorViewController, animated: true)
 			}
+			
+			editorViewController.completion =
+				{
+					editorResult in
+					
+					self.tableView.deselectRow(at: indexPath, animated: true)
+					
+					var indexPathsToReload: [IndexPath] = [indexPath]
+					
+					guard let editorResult = editorResult else
+					{
+						// Nil result means the user canceled the editor
+						return
+					}
+					
+					let registry = KeyBindingsRegistry.default
+					
+					switch editorResult
+					{
+					case .customize(let newBinding):
+						registry.registerCustomization(input: newBinding.input,
+													   modifiers: newBinding.modifiers,
+													   forKeyBinding: binding,
+													   inProviderWithIndex: providerIndex)
+						
+					case .unsassignAndCustomize(let unassignedBinding, let customizedBinding):
+						registry.customizeAsUnassigned(forKeyBinding: unassignedBinding.binding,
+													   inProviderWithIndex: unassignedBinding.providerIndex)
+						
+						registry.registerCustomization(input: customizedBinding.input,
+													   modifiers: customizedBinding.modifiers,
+													   forKeyBinding: binding,
+													   inProviderWithIndex: providerIndex)
+						
+						if let unassignedIndexPath = registry.indexPath(for: unassignedBinding.binding)
+						{
+							indexPathsToReload.append(unassignedIndexPath)
+						}
+						
+					case .revert:
+						registry.removeCustomization(forKeyBinding: binding,
+													 inProviderWithIndex: providerIndex)
+						
+					case .revertAndUnassign(let unassignedBinding):
+						registry.customizeAsUnassigned(forKeyBinding: unassignedBinding.binding,
+													   inProviderWithIndex: unassignedBinding.providerIndex)
+						
+						registry.removeCustomization(forKeyBinding: binding,
+													 inProviderWithIndex: providerIndex)
+						
+						if let unassignedIndexPath = registry.indexPath(for: unassignedBinding.binding)
+						{
+							indexPathsToReload.append(unassignedIndexPath)
+						}
+						
+					case .revertBoth(let conflictedBinding):
+						registry.removeCustomization(forKeyBinding: binding,
+													 inProviderWithIndex: providerIndex)
+						
+						registry.removeCustomization(forKeyBinding: conflictedBinding.binding,
+													 inProviderWithIndex: conflictedBinding.providerIndex)
+						
+						if let unassignedIndexPath = registry.indexPath(for: conflictedBinding.binding)
+						{
+							indexPathsToReload.append(unassignedIndexPath)
+						}
+						
+					case .unassign:
+						registry.customizeAsUnassigned(forKeyBinding: binding,
+													   inProviderWithIndex: providerIndex)
+					}
+					
+					self.tableView.reloadRows(at: indexPathsToReload, with: .automatic)
+				}
 
 			setupEditorController(editorViewController)
 		}
