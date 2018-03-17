@@ -103,35 +103,28 @@ open class KeyBindingsViewController: UITableViewController
 
 			let editorViewController = KeyBindingEditorViewController(binding: binding)
 
-			if UIDevice.current.userInterfaceIdiom == .pad
+			let navController = UINavigationController(rootViewController: editorViewController)
+			navController.navigationBar.barStyle = .default
+			navController.navigationBar.tintColor = view.tintColor
+			navController.modalPresentationStyle = .popover
+			navController.preferredContentSize = editorViewController.preferredContentSize
+			editorViewController.view.tintColor = view.tintColor
+
+			let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel,
+											   target: editorViewController,
+											   action: #selector(KeyBindingEditorViewController.cancel))
+
+			editorViewController.navigationItem.leftBarButtonItem = cancelButton
+
+			present(navController, animated: true, completion: nil)
+
+			if let view = (tableView.cellForRow(at: indexPath) as? KeyBindingCell)?.keyBindingLabel,
+			   let popoverController = navController.popoverPresentationController
 			{
-				let navController = UINavigationController(rootViewController: editorViewController)
-				navController.navigationBar.barStyle = .default
-				navController.navigationBar.tintColor = view.tintColor
-				navController.modalPresentationStyle = .popover
-				navController.preferredContentSize = editorViewController.preferredContentSize
-				editorViewController.view.tintColor = view.tintColor
-
-				let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel,
-				                                   target: editorViewController,
-				                                   action: #selector(KeyBindingEditorViewController.cancel))
-
-				editorViewController.navigationItem.leftBarButtonItem = cancelButton
-
-				present(navController, animated: true, completion: nil)
-
-				if let view = (tableView.cellForRow(at: indexPath) as? KeyBindingCell)?.keyBindingLabel,
-				   let popoverController = navController.popoverPresentationController
-				{
-					popoverController.backgroundColor = tableView.backgroundColor?.withAlphaComponent(0.9)
-					popoverController.permittedArrowDirections = .right
-					popoverController.sourceView = view
-					popoverController.sourceRect = CGRect(x: 0, y: view.bounds.midY, width: view.bounds.width, height: 0)
-				}
-			}
-			else
-			{
-				navigationController?.pushViewController(editorViewController, animated: true)
+				popoverController.backgroundColor = tableView.backgroundColor?.withAlphaComponent(0.9)
+				popoverController.permittedArrowDirections = .right
+				popoverController.sourceView = view
+				popoverController.sourceRect = CGRect(x: 0, y: view.bounds.midY, width: view.bounds.width, height: 0)
 			}
 			
 			editorViewController.completion =

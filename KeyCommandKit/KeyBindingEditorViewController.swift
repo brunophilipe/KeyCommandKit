@@ -112,14 +112,14 @@ public class KeyBindingEditorViewController: UIViewController
 
 	@objc func save()
 	{
-		dismissInContext()
+		dismiss(animated: true)
 	}
 
 	@objc func revert()
 	{
 		guard let originalBinding = (binding as? CustomizedKeyBinding)?.originalBinding else
 		{
-			dismissInContext()
+			dismiss(animated: true)
 			return
 		}
 
@@ -130,20 +130,20 @@ public class KeyBindingEditorViewController: UIViewController
 		else
 		{
 			result = .revert
-			dismissInContext()
+			dismiss(animated: true)
 		}
 	}
 
 	@objc func cancel()
 	{
 		result = nil
-		dismissInContext()
+		dismiss(animated: true)
 	}
 
 	@objc func unassign()
 	{
 		result = .unassign
-		dismissInContext()
+		dismiss(animated: true)
 	}
 
 	enum EditorResult
@@ -157,18 +157,6 @@ public class KeyBindingEditorViewController: UIViewController
 	}
 
 	// Private
-	
-	private func dismissInContext()
-	{
-		if self.popoverPresentationController != nil
-		{
-			dismiss(animated: true)
-		}
-		else
-		{
-			navigationController?.popViewController(animated: true)
-		}
-	}
 
 	func storeNewBinding(with keyCommand: UIKeyCommand, unassigning: KeyBindingsRegistry.BindingConflict? = nil)
 	{
@@ -193,13 +181,13 @@ public class KeyBindingEditorViewController: UIViewController
 	func reverBindingUnassigning(_ unassigning: KeyBindingsRegistry.BindingConflict)
 	{
 		result = .revertAndUnassign(unassigning)
-		dismissInContext()
+		dismiss(animated: true)
 	}
 
 	func reverBindingAndRevertConflict(_ conflict: KeyBindingsRegistry.BindingConflict)
 	{
 		result = .revertBoth(conflict)
-		dismissInContext()
+		dismiss(animated: true)
 	}
 
 	private func showConflictAlert(for conflictingBinding: KeyBindingsRegistry.BindingConflict, with keyCommand: UIKeyCommand)
