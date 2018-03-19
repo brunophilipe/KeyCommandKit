@@ -4,7 +4,7 @@ Pod::Spec.new do |spec|
   spec.homepage = 'https://github.com/brunophilipe/KeyCommandKit'
   spec.source = {:git => 'https://github.com/brunophilipe/KeyCommandKit.git'}
   spec.authors = {'Bruno Philipe' => 'me@bruno.ph'}
-  spec.summary = 'Library to manager, customize, and store UIKeyCommands.'
+  spec.summary = 'UIKeyCommand registration, customization, and reusability library.'
   spec.license = { :type => 'LGPL', :file => 'LICENSE' }
 
   spec.ios.deployment_target = '9.0'
