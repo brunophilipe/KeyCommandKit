@@ -2,7 +2,7 @@ Pod::Spec.new do |spec|
   spec.name = 'KeyCommandKit'
   spec.version = '1.0'
   spec.homepage = 'https://github.com/brunophilipe/KeyCommandKit'
-  spec.source = {:git => 'https://github.com/brunophilipe/KeyCommandKit.git'}
+  spec.source = {:git => 'https://github.com/brunophilipe/KeyCommandKit.git', :tag => 'v1.0'}
   spec.authors = {'Bruno Philipe' => 'me@bruno.ph'}
   spec.summary = 'UIKeyCommand registration, customization, and reusability library.'
   spec.license = { :type => 'LGPL', :file => 'LICENSE' }
