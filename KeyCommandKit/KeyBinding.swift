@@ -71,7 +71,7 @@ public class KeyBinding
 		}
 	}
 
-	public init(key: String, name: String, input: String, modifiers: UIKeyModifierFlags, isDiscoverable: Bool)
+	public init(key: String, name: String, input: String, modifiers: UIKeyModifierFlags, isDiscoverable: Bool = true)
 	{
 		self.key = key
 		self.name = name
