@@ -298,7 +298,7 @@ class KeyBindingInputControl: UIControl
 
 		var inputs = characters.map({ String($0) })
 
-		inputs.append(contentsOf: [UIKeyInputLeftArrow, UIKeyInputRightArrow, UIKeyInputUpArrow, UIKeyInputDownArrow, UIKeyInputEscape])
+		inputs.append(contentsOf: [UIKeyInputLeftArrow, UIKeyInputRightArrow, UIKeyInputUpArrow, UIKeyInputDownArrow, UIKeyInputEscape, UIKeyInputTab])
 
 		let action = #selector(KeyBindingInputControl.commandAction(_:))
 
@@ -318,6 +318,8 @@ class KeyBindingInputControl: UIControl
 
 			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.control, .alternate], action: action))
 		}
+
+		keyCommands.append(UIKeyCommand(input: UIKeyInputTab, modifierFlags: [], action: action))
 
 		self._keyCommands = keyCommands
 	}
