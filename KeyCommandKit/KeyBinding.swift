@@ -56,12 +56,21 @@ public class KeyBinding
 	/// customized to "Unassigned" by the user, this method returns `nil`.
 	public func make(withAction action: Selector) -> UIKeyCommand?
 	{
+		return make(withAction: action, hidden: false)
+	}
+
+	/// Makes a UIKeyCommand instance by attaching an action to the receiver binding. If the receiver binding was
+	/// customized to "Unassigned" by the user, this method returns `nil`. If `hidden` is `true`, makes the key command
+	/// as undiscoverable, even if it was originally registered as discoverable. This is used in the key bindings
+	/// editor.
+	internal func make(withAction action: Selector, hidden: Bool) -> UIKeyCommand?
+	{
 		if isUnassigned
 		{
 			return nil
 		}
 
-		if isDiscoverable, #available(iOS 9.0, *)
+		if isDiscoverable, #available(iOS 9.0, *), !hidden
 		{
 			return UIKeyCommand(input: input, modifierFlags: modifiers, action: action, discoverabilityTitle: name)
 		}
@@ -200,5 +209,18 @@ public extension Dictionary where Key == String, Value == KeyBinding
 		}
 
 		return keyCommands
+	}
+}
+
+extension KeyBinding: Hashable
+{
+	public static func == (lhs: KeyBinding, rhs: KeyBinding) -> Bool
+	{
+		return lhs.hashValue == rhs.hashValue
+	}
+
+	public var hashValue: Int
+	{
+		return "\(key.hashValue)\(input.hashValue)\(modifiers.rawValue)".hashValue
 	}
 }

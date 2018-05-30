@@ -330,6 +330,28 @@ internal extension KeyBindingsRegistry
 		}
 	}
 
+	/// Returns all bindings enabled in the registry, so the user can press them to jump to its place in the editor
+	/// table view controller
+	func allEnabledBindings() -> [KeyBinding : IndexPath]
+	{
+		var allBindings = [KeyBinding : IndexPath]()
+
+		for providerIndex in 0 ..< providersCount
+		{
+			for bindingIndex in 0 ..< bindingsCountForProvider(withIndex: providerIndex)
+			{
+				guard let binding = binding(withIndex: bindingIndex, forProviderWithIndex: providerIndex) else
+				{
+					continue
+				}
+
+				allBindings[binding] = IndexPath(row: bindingIndex, section: providerIndex)
+			}
+		}
+
+		return allBindings
+	}
+
 	/// Returns the n-th binding provided by a given provider. This is an internal method used to render the bindings
 	/// table view, and shouldn't be used for other purposes.
 	func binding(withIndex bindingIndex: Int, forProviderWithIndex providerIndex: Int) -> KeyBinding?

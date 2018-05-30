@@ -24,6 +24,8 @@ import UIKit
 @IBDesignable
 open class KeyBindingsViewController: UITableViewController
 {
+	private lazy var registry = KeyBindingsRegistry.default
+
 	override open func viewDidLoad()
 	{
         super.viewDidLoad()
@@ -44,7 +46,43 @@ open class KeyBindingsViewController: UITableViewController
 	open func setupEditorController(_ editorController: KeyBindingEditorViewController)
 	{}
 
-	private lazy var registry = KeyBindingsRegistry.default
+	private var keyCommandsCache: ([UIKeyCommand], [UIKeyCommand : IndexPath])? = nil
+
+	open override var keyCommands: [UIKeyCommand]?
+	{
+		if let keyCommands = keyCommandsCache?.0
+		{
+			return keyCommands
+		}
+
+		let keyBindings = registry.allEnabledBindings()
+		let selector = #selector(KeyBindingsViewController.showKeyBinding(_:))
+		let keyCommandsMap = keyBindings.remappingKeys { $0.make(withAction: selector, hidden: true) }
+		let keyCommands = Array(keyCommandsMap.keys)
+
+		keyCommandsCache = (keyCommands, keyCommandsMap)
+
+		return keyCommands
+	}
+
+	@objc private func showKeyBinding(_ keyCommand: UIKeyCommand?)
+	{
+		guard
+			let keyCommand = keyCommand,
+			let cache = keyCommandsCache,
+			let tableView = self.tableView,
+			let indexPath = cache.1[keyCommand]
+		else
+		{
+			return
+		}
+
+		tableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
+
+		DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+			tableView.deselectRow(at: indexPath, animated: true)
+		}
+	}
 
     // MARK: - Table view data source
 
@@ -222,4 +260,22 @@ public class KeyBindingCell: UITableViewCell
 {
 	@IBOutlet public var titleLabel: UILabel!
 	@IBOutlet public var keyBindingLabel: KeyBindingLabel!
+}
+
+extension Dictionary
+{
+	func remappingKeys<K>(_ keyremapperBlock: (Key) -> K?) -> [K: Value]
+	{
+		var newDict = [K: Value](minimumCapacity: count)
+
+		forEach
+			{
+				if let newKey = keyremapperBlock($0)
+				{
+					newDict[newKey] = $1
+				}
+			}
+
+		return newDict
+	}
 }
