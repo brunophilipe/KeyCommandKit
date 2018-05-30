@@ -44,39 +44,50 @@ open class KeyBindingsViewController: UITableViewController
 	open func setupEditorController(_ editorController: KeyBindingEditorViewController)
 	{}
 
+	private lazy var registry = KeyBindingsRegistry.default
+
     // MARK: - Table view data source
 
 	override open func numberOfSections(in tableView: UITableView) -> Int
 	{
-        return KeyBindingsRegistry.default.providersCount
+        return registry.providersCount
     }
 
 	override open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
 	{
-        return KeyBindingsRegistry.default.bindingsCountForProvider(withIndex: section)
+        return registry.bindingsCountForProvider(withIndex: section)
     }
+
+	override open func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String?
+	{
+		return registry.nameForProvider(withIndex: section)
+	}
 
 	override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
 	{
         let cell = tableView.dequeueReusableCell(withIdentifier: "KeyBindingCell", for: indexPath)
 
-		if let keyBindingCell = cell as? KeyBindingCell,
-			let original = KeyBindingsRegistry.default.binding(withIndex: indexPath.row, forProviderWithIndex: indexPath.section)
+		guard
+			let keyBindingCell = cell as? KeyBindingCell,
+			let original = registry.binding(withIndex: indexPath.row, forProviderWithIndex: indexPath.section)
+		else
 		{
-			// binding will be equivallent to original if there's no customization
-			let binding = KeyBindingsRegistry.default.customization(forKeyBinding: original, inProviderWithIndex: indexPath.section)
+			return cell
+		}
 
-			keyBindingCell.titleLabel.text = binding.name
+		// binding will be equivallent to original if there's no customization
+		let binding = registry.customization(forKeyBinding: original, inProviderWithIndex: indexPath.section)
 
-			if binding.isUnassigned
-			{
-				keyBindingCell.keyBindingLabel.isHidden = true
-			}
-			else
-			{
-				keyBindingCell.keyBindingLabel.keyBinding = binding
-				keyBindingCell.keyBindingLabel.isHidden = false
-			}
+		keyBindingCell.titleLabel.text = binding.name
+
+		if binding.isUnassigned
+		{
+			keyBindingCell.keyBindingLabel.isHidden = true
+		}
+		else
+		{
+			keyBindingCell.keyBindingLabel.keyBinding = binding
+			keyBindingCell.keyBindingLabel.isHidden = false
 		}
 
 		if cell.selectionStyle == .none
@@ -95,119 +106,115 @@ open class KeyBindingsViewController: UITableViewController
 	override open func tableView(_ aTableView: UITableView, didSelectRowAt indexPath: IndexPath)
 	{
 		let providerIndex = indexPath.section
+		let registry = self.registry
 
-		if let original = KeyBindingsRegistry.default.binding(withIndex: indexPath.row, forProviderWithIndex: providerIndex)
+		// binding will be equivalent to original if there's no customization
+		guard let original = registry.binding(withIndex: indexPath.row, forProviderWithIndex: providerIndex) else
 		{
-			// binding will be equivallent to original if there's no customization
-			let binding = KeyBindingsRegistry.default.customization(forKeyBinding: original, inProviderWithIndex: indexPath.section)
+			return
+		}
 
-			let editorViewController = KeyBindingEditorViewController(binding: binding)
+		let binding = registry.customization(forKeyBinding: original, inProviderWithIndex: indexPath.section)
 
-			let navController = UINavigationController(rootViewController: editorViewController)
-			navController.navigationBar.barStyle = .default
-			navController.navigationBar.tintColor = view.tintColor
-			navController.modalPresentationStyle = .popover
-			navController.preferredContentSize = editorViewController.preferredContentSize
-			editorViewController.view.tintColor = view.tintColor
+		let editorViewController = KeyBindingEditorViewController(binding: binding)
+		editorViewController.view.tintColor = view.tintColor
 
-			let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel,
-											   target: editorViewController,
-											   action: #selector(KeyBindingEditorViewController.cancel))
+		let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel,
+										   target: editorViewController,
+										   action: #selector(KeyBindingEditorViewController.cancel))
+		editorViewController.navigationItem.leftBarButtonItem = cancelButton
 
-			editorViewController.navigationItem.leftBarButtonItem = cancelButton
+		let navController = UINavigationController(rootViewController: editorViewController)
+		navController.navigationBar.barStyle = .default
+		navController.navigationBar.tintColor = view.tintColor
+		navController.modalPresentationStyle = .popover
+		navController.preferredContentSize = editorViewController.preferredContentSize
 
-			present(navController, animated: true, completion: nil)
+		present(navController, animated: true, completion: nil)
 
-			if let view = (tableView.cellForRow(at: indexPath) as? KeyBindingCell)?.keyBindingLabel,
-			   let popoverController = navController.popoverPresentationController
+		// Get source view to place the popover
+		if let view = (tableView.cellForRow(at: indexPath) as? KeyBindingCell)?.keyBindingLabel,
+		   let popoverController = navController.popoverPresentationController
+		{
+			popoverController.backgroundColor = tableView.backgroundColor?.withAlphaComponent(0.9)
+			popoverController.permittedArrowDirections = .right
+			popoverController.sourceView = view
+			popoverController.sourceRect = CGRect(x: 0, y: view.bounds.midY, width: view.bounds.width, height: 0)
+		}
+
+		editorViewController.completion =
 			{
-				popoverController.backgroundColor = tableView.backgroundColor?.withAlphaComponent(0.9)
-				popoverController.permittedArrowDirections = .right
-				popoverController.sourceView = view
-				popoverController.sourceRect = CGRect(x: 0, y: view.bounds.midY, width: view.bounds.width, height: 0)
-			}
-			
-			editorViewController.completion =
+				editorResult in
+
+				self.tableView.deselectRow(at: indexPath, animated: true)
+
+				var indexPathsToReload: [IndexPath] = [indexPath]
+
+				guard let editorResult = editorResult else
 				{
-					editorResult in
-					
-					self.tableView.deselectRow(at: indexPath, animated: true)
-					
-					var indexPathsToReload: [IndexPath] = [indexPath]
-					
-					guard let editorResult = editorResult else
-					{
-						// Nil result means the user canceled the editor
-						return
-					}
-					
-					let registry = KeyBindingsRegistry.default
-					
-					switch editorResult
-					{
-					case .customize(let newBinding):
-						registry.registerCustomization(input: newBinding.input,
-													   modifiers: newBinding.modifiers,
-													   forKeyBinding: binding,
-													   inProviderWithIndex: providerIndex)
-						
-					case .unsassignAndCustomize(let unassignedBinding, let customizedBinding):
-						registry.customizeAsUnassigned(forKeyBinding: unassignedBinding.binding,
-													   inProviderWithIndex: unassignedBinding.providerIndex)
-						
-						registry.registerCustomization(input: customizedBinding.input,
-													   modifiers: customizedBinding.modifiers,
-													   forKeyBinding: binding,
-													   inProviderWithIndex: providerIndex)
-						
-						if let unassignedIndexPath = registry.indexPath(for: unassignedBinding.binding)
-						{
-							indexPathsToReload.append(unassignedIndexPath)
-						}
-						
-					case .revert:
-						registry.removeCustomization(forKeyBinding: binding,
-													 inProviderWithIndex: providerIndex)
-						
-					case .revertAndUnassign(let unassignedBinding):
-						registry.customizeAsUnassigned(forKeyBinding: unassignedBinding.binding,
-													   inProviderWithIndex: unassignedBinding.providerIndex)
-						
-						registry.removeCustomization(forKeyBinding: binding,
-													 inProviderWithIndex: providerIndex)
-						
-						if let unassignedIndexPath = registry.indexPath(for: unassignedBinding.binding)
-						{
-							indexPathsToReload.append(unassignedIndexPath)
-						}
-						
-					case .revertBoth(let conflictedBinding):
-						registry.removeCustomization(forKeyBinding: binding,
-													 inProviderWithIndex: providerIndex)
-						
-						registry.removeCustomization(forKeyBinding: conflictedBinding.binding,
-													 inProviderWithIndex: conflictedBinding.providerIndex)
-						
-						if let unassignedIndexPath = registry.indexPath(for: conflictedBinding.binding)
-						{
-							indexPathsToReload.append(unassignedIndexPath)
-						}
-						
-					case .unassign:
-						registry.customizeAsUnassigned(forKeyBinding: binding,
-													   inProviderWithIndex: providerIndex)
-					}
-					
-					self.tableView.reloadRows(at: indexPathsToReload, with: .automatic)
+					// Nil result means the user canceled the editor
+					return
 				}
 
-			setupEditorController(editorViewController)
-		}
-	}
+				switch editorResult
+				{
+				case .customize(let newBinding):
+					registry.registerCustomization(input: newBinding.input,
+												   modifiers: newBinding.modifiers,
+												   forKeyBinding: binding,
+												   inProviderWithIndex: providerIndex)
 
-	override open func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String?
-	{
-		return KeyBindingsRegistry.default.nameForProvider(withIndex: section)
+				case .unsassignAndCustomize(let unassignedBinding, let customizedBinding):
+					registry.customizeAsUnassigned(forKeyBinding: unassignedBinding.binding,
+												   inProviderWithIndex: unassignedBinding.providerIndex)
+
+					registry.registerCustomization(input: customizedBinding.input,
+												   modifiers: customizedBinding.modifiers,
+												   forKeyBinding: binding,
+												   inProviderWithIndex: providerIndex)
+
+					if let unassignedIndexPath = registry.indexPath(for: unassignedBinding.binding)
+					{
+						indexPathsToReload.append(unassignedIndexPath)
+					}
+
+				case .revert:
+					registry.removeCustomization(forKeyBinding: binding,
+												 inProviderWithIndex: providerIndex)
+
+				case .revertAndUnassign(let unassignedBinding):
+					registry.customizeAsUnassigned(forKeyBinding: unassignedBinding.binding,
+												   inProviderWithIndex: unassignedBinding.providerIndex)
+
+					registry.removeCustomization(forKeyBinding: binding,
+												 inProviderWithIndex: providerIndex)
+
+					if let unassignedIndexPath = registry.indexPath(for: unassignedBinding.binding)
+					{
+						indexPathsToReload.append(unassignedIndexPath)
+					}
+
+				case .revertBoth(let conflictedBinding):
+					registry.removeCustomization(forKeyBinding: binding,
+												 inProviderWithIndex: providerIndex)
+
+					registry.removeCustomization(forKeyBinding: conflictedBinding.binding,
+												 inProviderWithIndex: conflictedBinding.providerIndex)
+
+					if let unassignedIndexPath = registry.indexPath(for: conflictedBinding.binding)
+					{
+						indexPathsToReload.append(unassignedIndexPath)
+					}
+
+				case .unassign:
+					registry.customizeAsUnassigned(forKeyBinding: binding,
+												   inProviderWithIndex: providerIndex)
+				}
+
+				self.tableView.reloadRows(at: indexPathsToReload, with: .automatic)
+			}
+
+		setupEditorController(editorViewController)
 	}
 }
 
