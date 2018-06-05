@@ -291,14 +291,19 @@ class KeyBindingInputControl: UIControl
 
 	private func makeKeyCommands()
 	{
-		let special = UIKeyInputBackspace + UIKeyInputTab + UIKeyInputReturn + UIKeyInputDelete
+		let special = UIKeyCommand.inputBackspace + UIKeyCommand.inputTab + UIKeyCommand.inputReturn + UIKeyCommand.inputDelete
 		let characters = "\(special)abcdefghijklmnopqrstuvwxyz!\"#$%&'()*+,-./0123456789:;<=>º?@[\\]^_`´{|}~"
 
 		var keyCommands = [UIKeyCommand]()
 
 		var inputs = characters.map({ String($0) })
 
-		inputs.append(contentsOf: [UIKeyInputLeftArrow, UIKeyInputRightArrow, UIKeyInputUpArrow, UIKeyInputDownArrow, UIKeyInputEscape, UIKeyInputTab])
+		inputs.append(contentsOf: [UIKeyCommand.inputLeftArrow,
+								   UIKeyCommand.inputRightArrow,
+								   UIKeyCommand.inputUpArrow,
+								   UIKeyCommand.inputDownArrow,
+								   UIKeyCommand.inputEscape,
+								   UIKeyCommand.inputTab])
 
 		let action = #selector(KeyBindingInputControl.commandAction(_:))
 
@@ -319,7 +324,7 @@ class KeyBindingInputControl: UIControl
 			keyCommands.append(UIKeyCommand(input: input, modifierFlags: [.control, .alternate], action: action))
 		}
 
-		keyCommands.append(UIKeyCommand(input: UIKeyInputTab, modifierFlags: [], action: action))
+		keyCommands.append(UIKeyCommand(input: UIKeyCommand.inputTab, modifierFlags: [], action: action))
 
 		self._keyCommands = keyCommands
 	}

@@ -23,10 +23,13 @@ import Foundation
 
 let kKeyCommandKitError = "com.brunophilipe.KeyCommandKit.Error"
 
-public let UIKeyInputBackspace: String = "\u{8}"
-public let UIKeyInputTab: String = "\u{9}"
-public let UIKeyInputReturn: String = "\u{D}"
-public let UIKeyInputDelete: String = "\u{7F}"
+extension UIKeyCommand
+{
+	public static let inputBackspace: String = "\u{8}"
+	public static let inputTab: String = "\u{9}"
+	public static let inputReturn: String = "\u{D}"
+	public static let inputDelete: String = "\u{7F}"
+}
 
 public class KeyBindingsRegistry
 {

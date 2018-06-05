@@ -153,28 +153,28 @@ internal extension KeyBinding
 
 		switch input
 		{
-		case UIKeyInputLeftArrow:
+		case UIKeyCommand.inputLeftArrow:
 			string += "←"
 
-		case UIKeyInputRightArrow:
+		case UIKeyCommand.inputRightArrow:
 			string += "→"
 
-		case UIKeyInputUpArrow:
+		case UIKeyCommand.inputUpArrow:
 			string += "↑"
 
-		case UIKeyInputDownArrow:
+		case UIKeyCommand.inputDownArrow:
 			string += "↓"
 
-		case UIKeyInputEscape:
+		case UIKeyCommand.inputEscape:
 			string += "⎋"
 
-		case UIKeyInputBackspace:
+		case UIKeyCommand.inputBackspace:
 			string += "⌫"
 
-		case UIKeyInputTab:
+		case UIKeyCommand.inputTab:
 			string += "⇥"
 
-		case UIKeyInputReturn:
+		case UIKeyCommand.inputReturn:
 			string += "↩︎"
 
 		default:
