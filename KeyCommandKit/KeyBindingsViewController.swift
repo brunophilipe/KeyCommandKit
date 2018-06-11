@@ -185,6 +185,9 @@ open class KeyBindingsViewController: UITableViewController
 				editorResult in
 
 				self.tableView.deselectRow(at: indexPath, animated: true)
+				
+				// Empty the key commands cache
+				self.keyCommandsCache = nil
 
 				var indexPathsToReload: [IndexPath] = [indexPath]
 

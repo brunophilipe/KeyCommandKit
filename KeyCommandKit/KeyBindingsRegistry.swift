@@ -344,8 +344,11 @@ internal extension KeyBindingsRegistry
 				{
 					continue
 				}
+				
+				// The custom binding will be equivalent to the binding if no customization is set.
+				let customBinding = customization(forKeyBinding: binding, inProviderWithIndex: providerIndex)
 
-				allBindings[binding] = IndexPath(row: bindingIndex, section: providerIndex)
+				allBindings[customBinding] = IndexPath(row: bindingIndex, section: providerIndex)
 			}
 		}
 
