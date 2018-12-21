@@ -131,31 +131,31 @@ public class KeyBindingLabel: UIView
 
 		switch input
 		{
-		case UIKeyInputLeftArrow:
+		case UIKeyCommand.inputLeftArrow:
 			inputStackView.addArrangedSubview(makeImage("left"))
 
-		case UIKeyInputRightArrow:
+		case UIKeyCommand.inputRightArrow:
 			inputStackView.addArrangedSubview(makeImage("right"))
 
-		case UIKeyInputUpArrow:
+		case UIKeyCommand.inputUpArrow:
 			inputStackView.addArrangedSubview(makeImage("up"))
 
-		case UIKeyInputDownArrow:
+		case UIKeyCommand.inputDownArrow:
 			inputStackView.addArrangedSubview(makeImage("down"))
 
-		case UIKeyInputEscape:
+		case UIKeyCommand.inputEscape:
 			inputStackView.addArrangedSubview(makeImage("esc"))
 
-		case UIKeyInputBackspace:
+		case UIKeyCommand.inputBackspace:
 			inputStackView.addArrangedSubview(makeImage("backspace"))
 
-		case UIKeyInputDelete:
+		case UIKeyCommand.inputDelete:
 			inputStackView.addArrangedSubview(makeImage("delete"))
 
-		case UIKeyInputTab:
+		case UIKeyCommand.inputTab:
 			inputStackView.addArrangedSubview(makeImage("tab"))
 
-		case UIKeyInputReturn:
+		case UIKeyCommand.inputReturn:
 			inputStackView.addArrangedSubview(makeImage("return"))
 
 		default:
@@ -163,7 +163,7 @@ public class KeyBindingLabel: UIView
 		}
 	}
 
-	lazy var attributes: [NSAttributedStringKey: Any] = [
+	lazy var attributes: [NSAttributedString.Key: Any] = [
 		.paragraphStyle: paragraphStyle,
 		.foregroundColor: UIColor.white,
 		.font: UIFont.systemFont(ofSize: targetHeight * 1.35)
