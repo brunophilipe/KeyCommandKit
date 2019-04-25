@@ -444,7 +444,7 @@ internal extension KeyBindingsRegistry
 							&& (key == nil || customizedBinding.key != key)
 				})
 			{
-				let providerIndex = providersSortOrder.index(of: providerHash)!
+				let providerIndex = providersSortOrder.firstIndex(of: providerHash)!
 				return BindingConflict(providerHash: providerHash,
 									   providerIndex: providerIndex,
 									   key: equivalentBinding.key,
