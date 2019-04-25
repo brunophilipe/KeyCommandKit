@@ -224,8 +224,10 @@ extension KeyBinding: Hashable
 		return lhs.hashValue == rhs.hashValue
 	}
 
-	public var hashValue: Int
+	public func hash(into hasher: inout Hasher)
 	{
-		return "\(key.hashValue)\(input.hashValue)\(modifiers.rawValue)".hashValue
+		hasher.combine(key)
+		hasher.combine(input)
+		hasher.combine(modifiers.rawValue)
 	}
 }
