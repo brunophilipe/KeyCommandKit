@@ -201,7 +201,7 @@ public extension Dictionary where Key == String, Value == KeyBinding
 {
 	/// Makes UIKeyCommand objects by attaching key bindings to actions by matching their respective `key`s.
 	/// If a key binding was customized to "Unassigned" by the user, then this routine skips it.
-	public func make(withActionsForKeys tuples: [(key: String, action: Selector)]) -> [UIKeyCommand]
+	func make(withActionsForKeys tuples: [(key: String, action: Selector)]) -> [UIKeyCommand]
 	{
 		var keyCommands = [UIKeyCommand]()
 

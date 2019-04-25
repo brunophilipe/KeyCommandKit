@@ -35,12 +35,12 @@ public protocol KeyBindingsProvider: NSObjectProtocol
 
 internal extension KeyBindingsProvider
 {
-	internal static var description: String
+	static var description: String
 	{
 		return NSStringFromClass(Self.self)
 	}
 
-	internal static var providerHash: Int
+	static var providerHash: Int
 	{
 		return NSStringFromClass(Self.self).hash
 	}
